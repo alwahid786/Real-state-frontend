@@ -1,0 +1,12 @@
+@import "tailwindcss";
+:root {
+  --primary-gradient: linear-gradient(180deg, #e6ce65 0%, #7c5825 100%);
+  --primary-text: #71717a;
+}
+.bg-primary {
+  background: var(--primary-gradient);
+}
+.hover-primary-gradient:hover {
+  background: var(--primary-gradient);
+  color: #ffffff;
+}

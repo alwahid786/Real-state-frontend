@@ -1,0 +1,98 @@
+import { Link } from "react-router-dom";
+import Button from "../../../components/shared/Button";
+import Input from "../../../components/shared/Input";
+import { useState } from "react";
+
+const SignInView = ({ handleLoginUser, isLoading }) => {
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+  return (
+    <section className="min-h-screen w-full flex flex-col lg:flex-row">
+      {/* Logo SEction */}
+      <div className="w-full lg:w-1/2 min-h-[40vh] lg:min-h-screen px-6 sm:px-10 lg:px-14 py-10 flex flex-col justify-center bg-black text-white">
+        <img
+          src={"/LogoPic.svg"}
+          alt="Assets Hunters"
+          className="w-36 sm:w-44 mb-8"
+        />
+
+        <h2 className="text-sm text-white sm:text-xl mb-4">
+          Welcome Back to <span className="font-bold">ASSETS HUNTERS</span>
+        </h2>
+
+        <p className="text-sm sm:text-xl text-white leading-relaxed max-w-md">
+          Manage properties, users, and handle operations — all in one place.
+        </p>
+      </div>
+
+      {/* Content SEction */}
+      <div className=" w-full lg:w-1/2 flex items-center justify-center bg-white px-4 sm:px-6 py-10 lg:rounded-l-[40px]">
+        <form className="w-full max-w-md">
+          <h2 className="text-xl font-semibold text-center mb-1">Sign In</h2>
+          <p className="text-sm text-gray-500 text-center mb-8">
+            Log in to your account.
+          </p>
+
+          {/* Email Input */}
+          <div className="mb-4">
+            <label htmlFor="email" className="block text-sm font-medium mb-1">
+              Email Address *
+            </label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
+
+          {/* Password Input */}
+          <div className="mb-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium mb-1"
+            >
+              Password *
+            </label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              placeholder="password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+            />
+          </div>
+
+          {/* Errr Message */}
+          <p className="text-xs text-red-500 mb-5">
+            Invalid email or password. Please try again.
+          </p>
+          <Button
+            type="submit"
+            text={"Sign in"}
+            cn={`h-[48px] ${isLoading ? "opacity-30 pointer-event-none" : ""}`}
+            disabled={isLoading}
+            onClick={(e) => {
+              e.preventDefault();
+              handleLoginUser(form.email, form.password);
+            }}
+          />
+
+          {/* Password Forgot */}
+          <Link to={"/reset-password"}>
+            <p className="text-sm text-center text-gray-500 underline mt-6 cursor-pointer">
+              Forgot your password?
+            </p>
+          </Link>
+        </form>
+      </div>
+    </section>
+  );
+};
+
+export default SignInView;

@@ -1,0 +1,76 @@
+import CreatePassword from "../src/pages/auth/CreatePassword";
+import Users from "../src/pages/users/Users";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Layout from "./pages/Layout";
+import SignIn from "./pages/auth/SignIn";
+import ResetPassword from "./pages/auth/ResetPassword";
+import Main from "./pages/comp/Main";
+import Properties from "./pages/comp/Properties";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { useSelector } from "react-redux";
+import { useGetMyProfileMutation } from "./features/auth/rtk/authApis";
+import { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { userExist, userNotExist } from "./features/auth/rtk/authSlice";
+import { useState } from "react";
+
+const App = () => {
+  const [loading, setLoading] = useState(true);
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const [getMyProfile] = useGetMyProfileMutation();
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        if (!user) {
+          const res = await getMyProfile().unwrap();
+          console.log("User profile fetched:", res);
+          if (res.success) {
+            dispatch(userExist(res.data));
+          } else {
+            dispatch(userNotExist());
+          }
+        }
+      } catch (error) {
+        userNotExist();
+        console.error("Failed to fetch user profile:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, [user, getMyProfile, dispatch]);
+
+  return (
+    <Router>
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
+        <Routes>
+          <Route element={<ProtectedRoute user={!user} redirectUrl="/" />}>
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route
+              path="/create-password/:token"
+              element={<CreatePassword />}
+            />
+          </Route>
+
+          {/*  Layout Routes */}
+          <Route element={<Layout />}>
+            <Route element={<ProtectedRoute user={user} />}>
+              <Route path="/" element={<Main />} />
+              <Route path="/create-new-comp" element={<Main />} />
+              <Route path="/users" element={<Users />} />
+              <Route path="/history" element={<Properties />} />
+            </Route>
+          </Route>
+        </Routes>
+      )}
+    </Router>
+  );
+};
+
+export default App;
