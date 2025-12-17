@@ -160,7 +160,7 @@ const MainView = () => {
           </div>
         </div>
         {/* Map */}
-        <div className="mt-12">
+        <div className="mt-12 hidden sm:block relative z-0">
           <Location />
         </div>
 

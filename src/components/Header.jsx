@@ -1,34 +1,42 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { HiOutlineBars3CenterLeft } from "react-icons/hi2";
 import profilePic from "../assets/profile.jpg";
 import Aside from "./Aside";
 
+const routeTitles = {
+  "/create-new-comp": "Create New Comp.",
+  "/users": "Users",
+  "/history": "History",
+};
+
 const Header = () => {
   const [mobileNav, setMobileNav] = useState(false);
+  const location = useLocation();
+
+  const currentTab = routeTitles[location.pathname] || "Create New Comp.";
 
   return (
-    <header className="flex h-[74px] items-center justify-between gap-4 rounded-lg bg-white p-4 lg:px-7 lg:py-4 shadow-sm">
+    <header className="flex h-18.5 items-center justify-between gap-4 rounded-lg bg-white p-4 lg:px-7 lg:py-4 shadow-sm">
       <div className="flex items-center gap-4">
-        {/* Hamburger for mobile */}
+        {/* Hamburger */}
         <button className="block xl:hidden" onClick={() => setMobileNav(true)}>
           <HiOutlineBars3CenterLeft size={27} className="text-gold-400" />
         </button>
         <div>
-          <h2 className="text-dark-text text-xl lg:text-2xl font-medium capitalize truncate w-[150px] md:w-full">
-            PathName
+          <h2 className="text-dark-text text-xl lg:text-2xl font-medium capitalize truncate w-37.5 md:w-full">
+            {currentTab}
           </h2>
         </div>
       </div>
 
-      {/* Right Section */}
-
+      {/* Profile */}
       <div className="flex gap-3 items-center">
         <img
           src={profilePic}
           alt="Profile"
           className="rounded-full w-9 h-9 sm:w-10 sm:h-10 object-cover"
-        />{" "}
+        />
         <div className="hidden md:flex flex-col gap-1">
           <h3 className="text-[18px] text-primary">Alexandera</h3>
           <p className="text-[10px] text-primary">alex@mail.com</p>

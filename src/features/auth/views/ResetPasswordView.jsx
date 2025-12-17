@@ -2,10 +2,48 @@ import { Link } from "react-router-dom";
 import BackIcon from "../../../assets/SVG/BackIcon";
 import Button from "../../../components/shared/Button";
 import Input from "../../../components/shared/Input";
+import { useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 const ResetPassword = () => {
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleResetPassword = async (email) => {
+    setIsLoading(true);
+    setError("");
+    try {
+      await new Promise((res) => setTimeout(res, 1000));
+
+      const isValidEmail = email === "test@example.com";
+      if (!isValidEmail) {
+        setError("Email is not valid. Please try again.");
+        toast.error("Email not valid");
+        setIsLoading(false);
+        return;
+      }
+
+      toast.success("Reset link sent to your email!");
+    } catch (err) {
+      setError(err.message || "Something went wrong");
+      toast.error(err.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    handleResetPassword(email);
+  };
+
   return (
     <section className="min-h-screen w-full flex flex-col lg:flex-row">
-      {/* Logo SEction */}
+      <ToastContainer position="top-right" autoClose={3000} />
+
+      {/* Logo Section */}
       <div className="w-full lg:w-1/2 min-h-[40vh] lg:min-h-screen px-6 sm:px-10 lg:px-14 py-10 flex flex-col justify-center bg-black text-white">
         <img
           src={"/LogoPic.svg"}
@@ -21,15 +59,17 @@ const ResetPassword = () => {
           Manage properties, users, and handle operations — all in one place.
         </p>
       </div>
+
+      {/* Back Button */}
       <div className="mt-3 ml-3 sm:mt-5 md:ml-2 w-6 sm:w-10">
         <Link to={"/"}>
           <BackIcon />
         </Link>
       </div>
 
-      {/* Content SEction */}
-      <div className=" w-full lg:w-1/2 flex items-center justify-center bg-white px-4 sm:px-6 py-10 lg:rounded-l-[40px]">
-        <div className="w-full max-w-md">
+      {/* Content Section */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white px-4 sm:px-6 py-10 lg:rounded-l-[40px]">
+        <form className="w-full max-w-md" onSubmit={handleSubmit}>
           <h2 className="text-xl font-semibold text-center mb-1">
             Reset Your Password
           </h2>
@@ -43,15 +83,24 @@ const ResetPassword = () => {
             <label className="block text-sm font-medium mb-1">
               Email Address *
             </label>
-            <Input type="email" placeholder="email" />
+            <Input
+              type="email"
+              placeholder="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
 
-          {/* Errr Message */}
-          <p className="text-xs text-red-500 mb-5">
-            Invalid email or password. Please try again.
-          </p>
-          <Button text={"Send Reset Link"} cn={"h-[48px]"} />
-        </div>
+          {/* Error message */}
+          {error && <p className="text-xs text-red-500 mb-5">{error}</p>}
+
+          <Button
+            type="submit"
+            text={"Send Reset Link"}
+            cn={`h-[48px] ${isLoading ? "opacity-30 pointer-events-none" : ""}`}
+            disabled={isLoading}
+          />
+        </form>
       </div>
     </section>
   );

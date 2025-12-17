@@ -1,16 +1,29 @@
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import Button from "../../../components/shared/Button";
 import Input from "../../../components/shared/Input";
-import { useState } from "react";
+import { toast } from "react-toastify";
 
 const SignInView = ({ handleLoginUser, isLoading }) => {
   const [form, setForm] = useState({
     email: "",
     password: "",
   });
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    try {
+      await handleLoginUser(form.email, form.password);
+    } catch (err) {
+      toast.error(err?.message || "Login failed.");
+    }
+  };
+
   return (
     <section className="min-h-screen w-full flex flex-col lg:flex-row">
-      {/* Logo SEction */}
+      {/* Logo Section */}
       <div className="w-full lg:w-1/2 min-h-[40vh] lg:min-h-screen px-6 sm:px-10 lg:px-14 py-10 flex flex-col justify-center bg-black text-white">
         <img
           src={"/LogoPic.svg"}
@@ -27,8 +40,8 @@ const SignInView = ({ handleLoginUser, isLoading }) => {
         </p>
       </div>
 
-      {/* Content SEction */}
-      <div className=" w-full lg:w-1/2 flex items-center justify-center bg-white px-4 sm:px-6 py-10 lg:rounded-l-[40px]">
+      {/* Content Section */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-white px-4 sm:px-6 py-10 lg:rounded-l-[40px]">
         <form className="w-full max-w-md">
           <h2 className="text-xl font-semibold text-center mb-1">Sign In</h2>
           <p className="text-sm text-gray-500 text-center mb-8">
@@ -68,19 +81,15 @@ const SignInView = ({ handleLoginUser, isLoading }) => {
             />
           </div>
 
-          {/* Errr Message */}
-          <p className="text-xs text-red-500 mb-5">
-            Invalid email or password. Please try again.
-          </p>
+          {/* Error */}
+          {error && <p className="text-xs text-red-500 mb-5">{error}</p>}
+
           <Button
             type="submit"
             text={"Sign in"}
-            cn={`h-[48px] ${isLoading ? "opacity-30 pointer-event-none" : ""}`}
+            cn={`h-[48px] ${isLoading ? "opacity-30 pointer-events-none" : ""}`}
             disabled={isLoading}
-            onClick={(e) => {
-              e.preventDefault();
-              handleLoginUser(form.email, form.password);
-            }}
+            onClick={handleSubmit}
           />
 
           {/* Password Forgot */}

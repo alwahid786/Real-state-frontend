@@ -17,17 +17,12 @@ import {
 import { toast } from "react-toastify";
 import { FiLoader } from "react-icons/fi";
 const UsersView = () => {
-  const [isDeletingUser, setIsDeletingUser] = useState(false);
+  const [isDeletingUser, setIsDeletingUser] = useState(null);
   // RTK Query Hooks
-  const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
-  const {
-    data,
-    isError,
-    isLoading: isFetching,
-    refetch: refetchAllUsers,
-  } = useGetAllUsersQuery();
+  const [createUser] = useCreateUserMutation();
+  const { data, refetch: refetchAllUsers } = useGetAllUsersQuery();
   const [deleteUser] = useDeleteUserMutation();
-  const [editUser, { isLoading: isEditing }] = useEditUserMutation();
+  const [editUser] = useEditUserMutation();
   // States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -40,14 +35,14 @@ const UsersView = () => {
   // Handlers
   const handleSave = async () => {
     if (!formData.firstName || !formData.lastName || !formData.email) {
-      alert("Please fill all required fields");
+      toast.error("Please fill all required fields");
       return;
     }
 
     try {
       if (editingUserId) {
         // Edit
-        await editUser({
+        const res = await editUser({
           id: editingUserId,
           data: {
             name: `${formData.firstName} ${formData.lastName}`,
@@ -55,14 +50,18 @@ const UsersView = () => {
             password: formData.password,
           },
         }).unwrap();
-        alert("User updated successfully!");
+        if (res.success) {
+          toast.success("User updated successfully!");
+        }
       } else {
         // Create
-        await createUser({
+        const res = await createUser({
           ...formData,
           name: `${formData.firstName} ${formData.lastName}`,
         }).unwrap();
-        alert("User added successfully!");
+        if (res.success) {
+          toast.success("User created successfully!");
+        }
       }
 
       setIsModalOpen(false);
@@ -76,12 +75,14 @@ const UsersView = () => {
       });
     } catch (error) {
       console.error("Error saving user:", error);
-      alert("Failed to save user. Please try again.");
+      toast.error(
+        error.data?.message || "Failed to save user. Please try again."
+      );
     }
   };
 
   const deleteUserHandler = async (row) => {
-    setIsDeletingUser(true);
+    setIsDeletingUser(row._id);
     try {
       const res = await deleteUser(row._id).unwrap();
       if (res.success) {
@@ -94,7 +95,7 @@ const UsersView = () => {
         error.data?.message || "Failed to delete user. Please try again."
       );
     } finally {
-      setIsDeletingUser(false);
+      setIsDeletingUser(null);
     }
   };
 
@@ -132,8 +133,8 @@ const UsersView = () => {
         <span
           className={`px-3 py-1 text-xs rounded-full text-white ${
             row.role === "admin"
-              ? "bg-[#34C7591A] !text-[#34C759]"
-              : "bg-[#E6CE6533] !text-[#FF9500]"
+              ? "bg-[#34C7591A] text-[#34C759]!"
+              : "bg-[#E6CE6533] text-[#FF9500]!"
           }`}
         >
           {row.role}
@@ -144,18 +145,20 @@ const UsersView = () => {
       name: "Action",
       cell: (row) => (
         <div className="flex gap-3">
-          <EditIcon
-            className="cursor-pointer"
-            onClick={() => handleEdit(row)}
-          />
+          <button>
+            <EditIcon
+              className="cursor-pointer"
+              onClick={() => handleEdit(row)}
+            />
+          </button>
           <button
-            disabled={isDeletingUser}
+            disabled={isDeletingUser === row._id}
             className={`cursor-pointer ${
-              isDeletingUser ? "opacity-50 pointer-events-none" : ""
+              isDeletingUser === row._id ? "opacity-50 pointer-events-none" : ""
             }`}
             onClick={() => deleteUserHandler(row)}
           >
-            {isDeletingUser ? (
+            {isDeletingUser === row?._id ? (
               <FiLoader className="animate-spin text-red-400" />
             ) : (
               <DeleteIcon />
@@ -195,7 +198,7 @@ const UsersView = () => {
 
         {isModalOpen && (
           <Modal
-            title="Add New User"
+            title={editingUserId ? "Edit User" : "Add New User"}
             onClose={() => setIsModalOpen(false)}
             width="w-[400px] md:w-[500px]"
           >
@@ -259,7 +262,7 @@ const UsersView = () => {
 
               <div className="flex justify-end">
                 <Button
-                  text="Send Invitation"
+                  text={editingUserId ? "Update User" : "Send Invitation"}
                   cn="text-white px-4 py-2 !w-auto"
                   full
                   width

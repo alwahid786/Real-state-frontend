@@ -9,11 +9,13 @@ import Logo from "/Logo.png";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useLogoutMutation } from "../features/auth/rtk/authApis";
-import Button from "./shared/Button";
 import { FiLoader } from "react-icons/fi";
 import { useDispatch } from "react-redux";
 import { userNotExist } from "../features/auth/rtk/authSlice";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+
+// const tabs = [ "Create New Comp.", "Users", "History"];
 
 const pages = [
   {
@@ -49,11 +51,11 @@ const Aside = () => {
         console.log("Logout successful:", res);
         dispatch(userNotExist());
         navigate("/sign-in");
-        alert(res.message || "Logout successful!");
+        toast.success(res.message || "Logout successful!");
       }
     } catch (error) {
       console.error("Logout failed:", error);
-      alert(error.data?.message || "Logout failed. Please try again.");
+      toast.error(error.data?.message || "Logout failed. Please try again.");
     }
   };
 
@@ -85,7 +87,7 @@ const Aside = () => {
         </div>
 
         {/* Menu */}
-        <div className="border-y-2 border-[#F6F6F6] py-4 flex-1">
+        <div className="border-y-2 border-[#F6F6F6] p-2 py-4 flex-1">
           <div className="flex flex-col gap-2">
             {pages.map((page) => (
               <Link to={page.link[0]} key={page.id}>
@@ -108,7 +110,7 @@ const Aside = () => {
         </div>
 
         {/* logout */}
-        <div className="p">
+        <div className="p-2">
           <button
             disabled={isLoading}
             className={`flex w-full cursor-pointer items-center rounded-lg p-3 transition-all duration-200 text-[#D55F5A] hover:text-white ${
