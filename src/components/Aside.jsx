@@ -109,20 +109,26 @@ const Aside = () => {
 
         {/* logout */}
         <div className="p">
-          <Button
+          <button
             disabled={isLoading}
-            cn={`flex items-center rounded-lg p-3 hover-primary-gradient text-[#D55F5A] hover:text-white ${
+            className={`flex w-full cursor-pointer items-center rounded-lg p-3 transition-all duration-200 text-[#D55F5A] hover:text-white ${
               isOpen ? "gap-3 justify-start" : "justify-center"
-            }`}
+            }  hover-primary-gradient hover:text-white`}
             onClick={logoutHandler}
           >
-            {isLoading ? <FiLoader className="animate-spin" /> : <LogoutIcon />}
-            {isOpen && (
-              <span className="text-sm font-medium whitespace-nowrap">
-                Logout
-              </span>
-            )}
-          </Button>
+            <span className="flex items-center gap-2">
+              {isLoading ? (
+                <FiLoader className="animate-spin" />
+              ) : (
+                <LogoutIcon />
+              )}
+              {isOpen && (
+                <span className="text-sm  font-medium whitespace-nowrap">
+                  Logout
+                </span>
+              )}
+            </span>
+          </button>
         </div>
       </div>
     </aside>

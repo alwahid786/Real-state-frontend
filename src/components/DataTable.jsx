@@ -80,22 +80,26 @@ const DataTable = ({ columns = [], data = [], pageSize = 10 }) => {
       </div>
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3 border-t border-[#71717A]">
-          <span className="text-sm text-gray-600"></span>
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 py-3 border-t border-[#E4E4E7] bg-white">
+          {/* Page No. */}
+          <span className="text-sm text-gray-500">
+            Page <span className="font-medium text-gray-800">{page}</span> of{" "}
+            <span className="font-medium text-gray-800">{totalPages}</span>
+          </span>
 
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <button
               disabled={page === 1}
               onClick={() => setPage((p) => p - 1)}
-              className="px-3 py-1 text-sm border rounded disabled:opacity-50"
+              className=" px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700  hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
             >
-              Prev
+              Previous
             </button>
 
             <button
               disabled={page === totalPages}
               onClick={() => setPage((p) => p + 1)}
-              className="px-3 py-1 text-sm border rounded disabled:opacity-50"
+              className=" px-4 py-2 text-sm font-medium rounded-md border border-gray-300 bg-white text-gray-700  hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
             >
               Next
             </button>

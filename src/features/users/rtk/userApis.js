@@ -8,6 +8,7 @@ const userApis = createApi({
     baseUrl: BaseUrl,
     credentials: "include",
   }),
+  tagTypes: ["Users"],
   endpoints: (builder) => ({
     createUser: builder.mutation({
       query: (data) => ({
@@ -15,9 +16,36 @@ const userApis = createApi({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["Users"],
+    }),
+
+    getAllUsers: builder.query({
+      query: () => "/auth/all",
+      providesTags: ["Users"],
+    }),
+
+    deleteUser: builder.mutation({
+      query: (id) => ({
+        url: `/auth/single/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["Users"],
+    }),
+    editUser: builder.mutation({
+      query: ({ id, data }) => ({
+        url: `/auth/single/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+      invalidatesTags: ["Users"],
     }),
   }),
 });
 
-export const { useCreateUserMutation } = userApis;
+export const {
+  useCreateUserMutation,
+  useGetAllUsersQuery,
+  useDeleteUserMutation,
+  useEditUserMutation,
+} = userApis;
 export default userApis;

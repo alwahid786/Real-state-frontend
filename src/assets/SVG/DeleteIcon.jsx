@@ -5,6 +5,7 @@ const DeleteIcon = ({
   height = 30,
   fill = "#FF3B30",
   className,
+  onClick,
 }) => {
   return (
     <svg
@@ -14,6 +15,7 @@ const DeleteIcon = ({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={className}
+      onClick={onClick}
     >
       <path
         d="M4.48633 0.374023H25.4229C27.694 0.374132 29.5351 2.21514 29.5352 4.48633V25.4229C29.535 27.694 27.694 29.535 25.4229 29.5352H4.48633C2.21514 29.5351 0.374132 27.694 0.374023 25.4229V4.48633C0.374036 2.21508 2.21508 0.374036 4.48633 0.374023Z"

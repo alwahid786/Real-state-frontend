@@ -8,9 +8,27 @@ import DeleteIcon from "../../../assets/SVG/DeleteIcon";
 import Button from "../../../components/shared/Button";
 import PlusIcon from "../../../assets/SVG/PlusIcon";
 import Input from "../../../components/shared/Input";
-import { useCreateUserMutation } from "../rtk/userApis";
+import {
+  useCreateUserMutation,
+  useDeleteUserMutation,
+  useEditUserMutation,
+  useGetAllUsersQuery,
+} from "../rtk/userApis";
+import { toast } from "react-toastify";
+import { FiLoader } from "react-icons/fi";
 const UsersView = () => {
-  const [createUser, { isLoading }] = useCreateUserMutation();
+  const [isDeletingUser, setIsDeletingUser] = useState(false);
+  // RTK Query Hooks
+  const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
+  const {
+    data,
+    isError,
+    isLoading: isFetching,
+    refetch: refetchAllUsers,
+  } = useGetAllUsersQuery();
+  const [deleteUser] = useDeleteUserMutation();
+  const [editUser, { isLoading: isEditing }] = useEditUserMutation();
+  // States
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
@@ -18,51 +36,37 @@ const UsersView = () => {
     email: "",
     password: "12345678",
   });
-
-  // const handleSave = () => {
-  //   console.log("User Data:", formData);
-  //   setIsModalOpen(false);
-  //   setFormData({ firstName: "", lastName: "", email: "", password: "" });
-  // };
-
-  // const handleSave = async () => {
-  //   try {
-  //     const userPayload = {
-  //       name: `${formData.firstName} ${formData.lastName}`,
-  //       email: formData.email,
-  //       phone: formData.phone,
-  //     };
-  //     const response = await createUser(userPayload).unwrap();
-  //     console.log("User created successfully:", response);
-  //     alert("Invitation sent successfully!");
-  //     setIsModalOpen(false);
-  //     setFormData({ firstName: "", lastName: "", email: "", phone: "" });
-  //   } catch (error) {
-  //     console.error("Failed to create user:", error);
-  //     alert(
-  //       error.data?.message || "Failed to send invitation. Please try again."
-  //     );
-  //   }
-  // };
+  const [editingUserId, setEditingUserId] = useState(null);
+  // Handlers
   const handleSave = async () => {
-    if (
-      !formData.firstName ||
-      !formData.lastName ||
-      !formData.email ||
-      !formData.phone ||
-      !formData.password
-    ) {
+    if (!formData.firstName || !formData.lastName || !formData.email) {
       alert("Please fill all required fields");
       return;
     }
-    try {
-      await createUser({
-        ...formData,
-        name: `${formData.firstName} ${formData.lastName}`,
-      }).unwrap();
 
-      alert("User added successfully!");
+    try {
+      if (editingUserId) {
+        // Edit
+        await editUser({
+          id: editingUserId,
+          data: {
+            name: `${formData.firstName} ${formData.lastName}`,
+            email: formData.email,
+            password: formData.password,
+          },
+        }).unwrap();
+        alert("User updated successfully!");
+      } else {
+        // Create
+        await createUser({
+          ...formData,
+          name: `${formData.firstName} ${formData.lastName}`,
+        }).unwrap();
+        alert("User added successfully!");
+      }
+
       setIsModalOpen(false);
+      setEditingUserId(null);
       setFormData({
         firstName: "",
         lastName: "",
@@ -71,10 +75,40 @@ const UsersView = () => {
         phone: "",
       });
     } catch (error) {
-      console.error("Error creating user:", error);
-      alert("Failed to add user. Please try again.");
+      console.error("Error saving user:", error);
+      alert("Failed to save user. Please try again.");
     }
   };
+
+  const deleteUserHandler = async (row) => {
+    setIsDeletingUser(true);
+    try {
+      const res = await deleteUser(row._id).unwrap();
+      if (res.success) {
+        await refetchAllUsers();
+        toast.success(res.message || "User deleted successfully!");
+      }
+    } catch (error) {
+      console.log("Error while deleting user:", error);
+      toast.error(
+        error.data?.message || "Failed to delete user. Please try again."
+      );
+    } finally {
+      setIsDeletingUser(false);
+    }
+  };
+
+  const handleEdit = (user) => {
+    setEditingUserId(user._id);
+    setFormData({
+      firstName: user.name.split(" ")[0],
+      lastName: user.name.split(" ")[1] || "",
+      email: user.email,
+      password: "....",
+    });
+    setIsModalOpen(true);
+  };
+  // Table Columns
   const columns = [
     {
       name: "Name",
@@ -85,63 +119,50 @@ const UsersView = () => {
       selector: (row) => row.email,
     },
     {
-      name: "Phone No.",
-      selector: (row) => row.phone,
+      name: "Password",
+      selector: (row) => row.password,
     },
     {
       name: "Created At",
       selector: (row) => row.createdAt,
     },
     {
-      name: "Status",
+      name: "Roles",
       cell: (row) => (
         <span
           className={`px-3 py-1 text-xs rounded-full text-white ${
-            row.status === "Active"
+            row.role === "admin"
               ? "bg-[#34C7591A] !text-[#34C759]"
               : "bg-[#E6CE6533] !text-[#FF9500]"
           }`}
         >
-          {row.status}
+          {row.role}
         </span>
       ),
     },
     {
       name: "Action",
-      cell: () => (
+      cell: (row) => (
         <div className="flex gap-3">
-          <EditIcon className="cursor-pointer" />
-          <DeleteIcon className=" cursor-pointer" />
+          <EditIcon
+            className="cursor-pointer"
+            onClick={() => handleEdit(row)}
+          />
+          <button
+            disabled={isDeletingUser}
+            className={`cursor-pointer ${
+              isDeletingUser ? "opacity-50 pointer-events-none" : ""
+            }`}
+            onClick={() => deleteUserHandler(row)}
+          >
+            {isDeletingUser ? (
+              <FiLoader className="animate-spin text-red-400" />
+            ) : (
+              <DeleteIcon />
+            )}
+          </button>
         </div>
       ),
-    },
-  ];
-
-  const data = [
-    {
-      id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "+1 234 567 890",
-      createdAt: "12 Sep 2024",
-      status: "Active",
-    },
-
-    {
-      id: 2,
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "+1 234 567 890",
-      createdAt: "12 Sep 2024",
-      status: "Pending",
-    },
-    {
-      id: 3,
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "+1 234 567 890",
-      createdAt: "12 Sep 2024",
-      status: "Pending",
     },
   ];
 
@@ -158,7 +179,17 @@ const UsersView = () => {
             text="Add New User"
             cn="px-4 py-2"
             icon={<PlusIcon />}
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setFormData({
+                firstName: "",
+                lastName: "",
+                email: "",
+                password: "12345678",
+                phone: "",
+              });
+              setEditingUserId(null);
+              setIsModalOpen(true);
+            }}
           />
         </div>
 
@@ -212,16 +243,16 @@ const UsersView = () => {
                 />
               </div>
               <div>
-                <label className="block mb-1" htmlFor="phone">
-                  Phone No.*
+                <label className="block mb-1" htmlFor="password">
+                  Password
                 </label>
                 <Input
                   type="text"
-                  name="phone"
-                  placeholder="+00 00 000 000"
-                  value={formData.phone || ""}
+                  name="password"
+                  placeholder=""
+                  value={formData.password || ""}
                   onChange={(e) =>
-                    setFormData({ ...formData, phone: e.target.value })
+                    setFormData({ ...formData, password: e.target.value })
                   }
                 />
               </div>
@@ -239,7 +270,7 @@ const UsersView = () => {
           </Modal>
         )}
       </div>
-      <DataTable columns={columns} data={data} />
+      <DataTable columns={columns} data={data?.data || []} />
     </div>
   );
 };
