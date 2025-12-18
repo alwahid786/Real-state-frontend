@@ -22,7 +22,6 @@ const CreatePasswordView = () => {
     if (pwd.length < 10) return "Medium";
     return "Strong";
   };
-  console.log("Create Password Strength:", getPasswordStrength(createPassword));
 
   const passwordsDoNotMatch =
     confirmPassword.length > 0 && createPassword !== confirmPassword;

@@ -14,7 +14,6 @@ const SignIn = () => {
         return;
       }
       const res = await loginUser({ email, password }).unwrap();
-      console.log("Login response:", res);
       if (res.success) {
         toast.success(res.message || "Login successful!");
         dispatch(userExist(res.data));

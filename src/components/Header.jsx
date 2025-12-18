@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { HiOutlineBars3CenterLeft } from "react-icons/hi2";
 import profilePic from "../assets/profile.jpg";
 import Aside from "./Aside";
+import { useSelector } from "react-redux";
 
 const routeTitles = {
   "/create-new-comp": "Create New Comp.",
@@ -13,6 +14,7 @@ const routeTitles = {
 const Header = () => {
   const [mobileNav, setMobileNav] = useState(false);
   const location = useLocation();
+  const { user } = useSelector((state) => state.auth);
 
   const currentTab = routeTitles[location.pathname] || "Create New Comp.";
 
@@ -38,8 +40,8 @@ const Header = () => {
           className="rounded-full w-9 h-9 sm:w-10 sm:h-10 object-cover"
         />
         <div className="hidden md:flex flex-col gap-1">
-          <h3 className="text-[18px] text-primary">Alexandera</h3>
-          <p className="text-[10px] text-primary">alex@mail.com</p>
+          <h3 className="text-[18px] text-primary">{user?.name || "—"}</h3>
+          <p className="text-[10px] text-primary">{user?.email || "—"}</p>
         </div>
       </div>
 

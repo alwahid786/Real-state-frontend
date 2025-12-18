@@ -25,7 +25,6 @@ const App = () => {
       try {
         if (!user) {
           const res = await getMyProfile().unwrap();
-          console.log("User profile fetched:", res);
           if (res.success) {
             dispatch(userExist(res.data));
           } else {

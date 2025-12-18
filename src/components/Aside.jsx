@@ -48,7 +48,6 @@ const Aside = () => {
     try {
       const res = await logout().unwrap();
       if (res.success) {
-        console.log("Logout successful:", res);
         dispatch(userNotExist());
         navigate("/sign-in");
         toast.success(res.message || "Logout successful!");

@@ -90,7 +90,6 @@ const UsersView = () => {
         toast.success(res.message || "User deleted successfully!");
       }
     } catch (error) {
-      console.log("Error while deleting user:", error);
       toast.error(
         error.data?.message || "Failed to delete user. Please try again."
       );
