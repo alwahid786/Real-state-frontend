@@ -93,7 +93,7 @@ const SignInView = ({ handleLoginUser, isLoading }) => {
           />
 
           {/* Password Forgot */}
-          <Link to={"/reset-password"}>
+          <Link to={"/forget-password"}>
             <p className="text-sm text-center text-gray-500 underline mt-6 cursor-pointer">
               Forgot your password?
             </p>
