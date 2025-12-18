@@ -5,38 +5,25 @@ import Input from "../../../components/shared/Input";
 import { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useForgetPasswordMutation } from "../rtk/authApis";
 
-const ResetPassword = () => {
+const ForgetPasswordView = () => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [ForgetPassword, { isLoading: isResetting }] =
+    useForgetPasswordMutation();
 
-  const handleResetPassword = async (email) => {
-    setIsLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setError("");
     try {
-      await new Promise((res) => setTimeout(res, 1000));
-
-      const isValidEmail = email === "test@example.com";
-      if (!isValidEmail) {
-        setError("Email is not valid. Please try again.");
-        toast.error("Email not valid");
-        setIsLoading(false);
-        return;
-      }
-
-      toast.success("Reset link sent to your email!");
+      const res = await ForgetPassword({ email }).unwrap();
+      toast.success(res.message || "Reset link sent to your email!");
     } catch (err) {
-      setError(err.message || "Something went wrong");
-      toast.error(err.message || "Something went wrong");
-    } finally {
-      setIsLoading(false);
+      const message = err?.data?.message || "Error while reseting password";
+      setError(message);
+      toast.error(message);
     }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    handleResetPassword(email);
   };
 
   return (
@@ -96,9 +83,11 @@ const ResetPassword = () => {
 
           <Button
             type="submit"
-            text={"Send Reset Link"}
-            cn={`h-[48px] ${isLoading ? "opacity-30 pointer-events-none" : ""}`}
-            disabled={isLoading}
+            text={isResetting ? "Sending..." : "Send Reset Link"}
+            cn={`h-[48px] ${
+              isResetting ? "opacity-30 pointer-events-none" : ""
+            }`}
+            disabled={isResetting}
           />
         </form>
       </div>
@@ -106,4 +95,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default ForgetPasswordView;

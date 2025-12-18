@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const BaseUrl =
-  import.meta.env.VITE_BASE_URL || "https://ai-scrapper-72jb.onrender.com/api";
+const BaseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:4001";
 const authApis = createApi({
   reducerPath: "authApis",
   baseQuery: fetchBaseQuery({
@@ -28,9 +27,28 @@ const authApis = createApi({
         method: "GET",
       }),
     }),
+    forgetPassword: builder.mutation({
+      query: (data) => ({
+        url: "/forgetpassword",
+        method: "POST",
+        body: data,
+      }),
+    }),
+    resetpassword: builder.mutation({
+      query: (data) => ({
+        url: "/resetpassword",
+        method: "POST",
+        body: data,
+      }),
+    }),
   }),
 });
 
-export const { useLoginMutation, useGetMyProfileMutation, useLogoutMutation } =
-  authApis;
+export const {
+  useLoginMutation,
+  useGetMyProfileMutation,
+  useLogoutMutation,
+  useForgetPasswordMutation,
+  useResetpasswordMutation,
+} = authApis;
 export default authApis;

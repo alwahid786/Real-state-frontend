@@ -29,7 +29,7 @@ const UsersView = () => {
     firstName: "",
     lastName: "",
     email: "",
-    password: "12345678",
+    // password: "12345678",
   });
   const [editingUserId, setEditingUserId] = useState(null);
   // Handlers
@@ -70,7 +70,7 @@ const UsersView = () => {
         firstName: "",
         lastName: "",
         email: "",
-        password: "12345678",
+        // password: "12345678",
         phone: "",
       });
     } catch (error) {
@@ -104,7 +104,7 @@ const UsersView = () => {
       firstName: user.name.split(" ")[0],
       lastName: user.name.split(" ")[1] || "",
       email: user.email,
-      password: "....",
+      // password: "",
     });
     setIsModalOpen(true);
   };
@@ -203,7 +203,7 @@ const UsersView = () => {
           >
             <div className="flex flex-col gap-4">
               <div>
-                <label className="block mb-1" htmlFor="firstName">
+                <label className="block mb-1 font-semibold" htmlFor="firstName">
                   First Name *
                 </label>
                 <Input
@@ -217,7 +217,7 @@ const UsersView = () => {
                 />
               </div>
               <div>
-                <label className="block mb-1" htmlFor="lastName">
+                <label className="block mb-1 font-semibold" htmlFor="lastName">
                   Last Name *
                 </label>
                 <Input
@@ -231,7 +231,7 @@ const UsersView = () => {
                 />
               </div>
               <div>
-                <label className="block mb-1" htmlFor="email">
+                <label className="block mb-1 font-semibold" htmlFor="email">
                   Email *
                 </label>
                 <Input
@@ -244,9 +244,9 @@ const UsersView = () => {
                   }
                 />
               </div>
-              <div>
-                <label className="block mb-1" htmlFor="password">
-                  Password
+              {/* <div>
+                <label className="block mb-1 font-semibold" htmlFor="password">
+                  Password *
                 </label>
                 <Input
                   type="text"
@@ -257,7 +257,7 @@ const UsersView = () => {
                     setFormData({ ...formData, password: e.target.value })
                   }
                 />
-              </div>
+              </div> */}
 
               <div className="flex justify-end">
                 <Button

@@ -1,4 +1,4 @@
-import ResetPasswordView from "../../features/auth/views/ResetPasswordView";
+import ResetPasswordView from "../../features/auth/views/CreatePasswordView";
 
 const ResetPassword = () => {
   return <ResetPasswordView />;

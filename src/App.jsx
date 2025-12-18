@@ -1,9 +1,7 @@
-import CreatePassword from "../src/pages/auth/CreatePassword";
 import Users from "../src/pages/users/Users";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import SignIn from "./pages/auth/SignIn";
-import ResetPassword from "./pages/auth/ResetPassword";
 import Main from "./pages/comp/Main";
 import Properties from "./pages/comp/Properties";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -13,6 +11,9 @@ import { useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { userExist, userNotExist } from "./features/auth/rtk/authSlice";
 import { useState } from "react";
+import Spinner from "./components/shared/Spinner";
+import ForgetPassword from "./pages/auth/ForgetPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -45,16 +46,13 @@ const App = () => {
   return (
     <Router>
       {loading ? (
-        <div>Loading...</div>
+        <Spinner size={60} />
       ) : (
         <Routes>
           <Route element={<ProtectedRoute user={!user} redirectUrl="/" />}>
             <Route path="/sign-in" element={<SignIn />} />
-            <Route path="/reset-password" element={<ResetPassword />} />
-            <Route
-              path="/create-password/:token"
-              element={<CreatePassword />}
-            />
+            <Route path="/forget-password" element={<ForgetPassword />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
           </Route>
 
           {/*  Layout Routes */}

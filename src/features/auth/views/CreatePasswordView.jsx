@@ -3,13 +3,18 @@ import Button from "../../../components/shared/Button";
 import Input from "../../../components/shared/Input";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { useResetpasswordMutation } from "../rtk/authApis";
+import { toast } from "react-toastify";
 
-const CreatePasswordView = () => {
+const ResetPasswordView = () => {
+  const navigate = useNavigate();
+  const { token } = useParams();
   const [createPassword, setCreatePassword] = useState("");
   const [showCreatePassword, setShowCreatePassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [ResetPassowrd] = useResetpasswordMutation();
 
   const toggleShowCreatePassword = () => setShowCreatePassword((prev) => !prev);
   const toggleShowConfirmPassword = () =>
@@ -21,6 +26,28 @@ const CreatePasswordView = () => {
     if (pwd.length < 6) return "Weak";
     if (pwd.length < 10) return "Medium";
     return "Strong";
+  };
+
+  const resetPasswordHandler = async () => {
+    try {
+      if (!token || !createPassword || !confirmPassword) {
+        return toast.error("Please Enter All fields or try again");
+      }
+      const res = await ResetPassowrd({
+        token,
+        password: createPassword,
+        confirmPassword,
+      }).unwrap();
+      if (res.success) {
+        toast.success(res.message);
+        return navigate("/sign-in");
+      }
+    } catch (error) {
+      console.log("Error while reseting password");
+      toast.error(
+        error.data.message || "Error while reseting password please try again"
+      );
+    }
   };
 
   const passwordsDoNotMatch =
@@ -129,7 +156,11 @@ const CreatePasswordView = () => {
               </p>
             )}
 
-            <Button text={"Reset Password"} cn={"h-[48px]"} />
+            <Button
+              onClick={resetPasswordHandler}
+              text={"Reset Password"}
+              cn={"h-[48px]"}
+            />
           </div>
         </div>
       </section>
@@ -137,4 +168,4 @@ const CreatePasswordView = () => {
   );
 };
 
-export default CreatePasswordView;
+export default ResetPasswordView;
