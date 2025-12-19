@@ -12,7 +12,7 @@ const Layout = () => {
         >
           <Aside />
         </div>
-        <div className="flex-1">
+        <div className="flex-1 flex-col min-w-0">
           <Header />
           <main className="overflow-y-scroll scroll-0 overflow-x-visible mt-5 rounded-lg h-[calc(100vh-110px)]">
             <Outlet />

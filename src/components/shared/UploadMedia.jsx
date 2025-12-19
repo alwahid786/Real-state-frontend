@@ -56,7 +56,7 @@ const UploadMedia = () => {
           {files.map((item, index) => (
             <div
               key={index}
-              className="relative h-[150px] group rounded overflow-hidden"
+              className="relative h-37.5 group rounded overflow-hidden"
             >
               <img
                 src={item.preview}
@@ -64,23 +64,25 @@ const UploadMedia = () => {
                 className="object-cover w-full h-full"
               />
 
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center gap-2 transition">
-                <button
-                  onClick={() => handleDelete(index)}
-                  className="p-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
-                >
-                  <FiTrash2 size={16} />
-                </button>
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition">
+                <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-2">
+                  <button
+                    onClick={() => handleDelete(index)}
+                    className="p-2 bg-red-600 text-white rounded hover:bg-red-700 cursor-pointer"
+                  >
+                    <FiTrash2 size={16} />
+                  </button>
 
-                <label className="p-2 bg-primary text-white rounded cursor-pointer hover:bg-[#3EAD92]">
-                  <TbReplace size={16} />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => handleReplace(e, index)}
-                  />
-                </label>
+                  <label className="p-2 bg-primary text-white rounded cursor-pointer hover:bg-[#3EAD92]">
+                    <TbReplace size={16} />
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => handleReplace(e, index)}
+                    />
+                  </label>
+                </div>
               </div>
             </div>
           ))}
@@ -88,7 +90,7 @@ const UploadMedia = () => {
           {/* Upload Media Tile */}
           <div
             onClick={() => imageRef.current.click()}
-            className="h-[150px] flex flex-col items-center justify-center gap-2 rounded cursor-pointer bg-[#D5D5D54D] hover:bg-[#D5D5D580] transition"
+            className="h-37.5 flex flex-col items-center justify-center gap-2 rounded cursor-pointer bg-[#D5D5D54D] hover:bg-[#D5D5D580] transition"
           >
             <FiUpload size={22} />
             <p className="font-medium text-sm">+ Upload</p>

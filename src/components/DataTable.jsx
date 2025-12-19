@@ -67,7 +67,7 @@ const DataTable = ({ columns = [], data = [], pageSize = 10 }) => {
                   <span className="text-sm font-medium text-[#71717A]">
                     {col.name}
                   </span>
-                  <span className="text-sm text-[#09090B] text-right">
+                  <span className="text-sm truncate text-[#09090B] text-right">
                     {col.cell ? col.cell(row) : col.selector(row)}
                   </span>
                 </div>

@@ -15,19 +15,7 @@ const Header = () => {
   const [mobileNav, setMobileNav] = useState(false);
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
-
   const currentTab = routeTitles[location.pathname] || "Create New Comp.";
-  // const getUserInitial = () => {
-  //   if (user?.name && user.name.trim().length > 0) {
-  //     return user.name.trim().charAt(0).toUpperCase();
-  //   }
-
-  //   if (user?.email && user.email.trim().length > 0) {
-  //     return user.email.trim().charAt(0).toUpperCase();
-  //   }
-
-  //   return "U";
-  // };
   const initial = getUserInitial(user);
   const avatarColor = getAvatarColor(initial);
 
@@ -61,7 +49,7 @@ const Header = () => {
 
       {/* Mobile Aside  */}
       <div
-        className={`block xl:hidden fixed w-full h-full inset-0 bg-[#00000071] z-50 transition-all duration-500 ${
+        className={`block xl:hidden fixed inset-0 bg-[#00000071] z-50 transition-all duration-500 ${
           mobileNav
             ? "visible opacity-100"
             : "invisible opacity-0 pointer-events-none"
@@ -72,6 +60,7 @@ const Header = () => {
           className={`absolute top-3 left-3 h-[calc(100svh-24px)] transition-transform duration-500 ${
             mobileNav ? "translate-x-0" : "-translate-x-full"
           }`}
+          onClick={(e) => e.stopPropagation()}
         >
           <Aside />
         </div>
