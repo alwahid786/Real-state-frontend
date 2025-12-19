@@ -6,16 +6,28 @@ import { useSelector } from "react-redux";
 import { getUserInitial, getAvatarColor } from "../utils/avatar";
 
 const routeTitles = {
-  "/create-new-comp": "Create New Comp.",
+  "/create-new-comp": "Main",
   "/users": "Users",
-  "/history": "History",
+  "/history": "Properties",
 };
 
 const Header = () => {
   const [mobileNav, setMobileNav] = useState(false);
   const location = useLocation();
   const { user } = useSelector((state) => state.auth);
-  const currentTab = routeTitles[location.pathname] || "Create New Comp.";
+
+  const currentTab = routeTitles[location.pathname] || "Main";
+  // const getUserInitial = () => {
+  //   if (user?.name && user.name.trim().length > 0) {
+  //     return user.name.trim().charAt(0).toUpperCase();
+  //   }
+
+  //   if (user?.email && user.email.trim().length > 0) {
+  //     return user.email.trim().charAt(0).toUpperCase();
+  //   }
+
+  //   return "U";
+  // };
   const initial = getUserInitial(user);
   const avatarColor = getAvatarColor(initial);
 

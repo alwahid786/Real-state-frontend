@@ -1,7 +1,6 @@
-import React, { useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { FiUpload, FiTrash2 } from "react-icons/fi";
 import { TbReplace } from "react-icons/tb";
-import Button from "../../components/shared/Button";
 
 const UploadMedia = () => {
   const imageRef = useRef(null);
@@ -73,7 +72,7 @@ const UploadMedia = () => {
                     <FiTrash2 size={16} />
                   </button>
 
-                  <label className="p-2 bg-primary text-white rounded cursor-pointer hover:bg-[#3EAD92]">
+                  <label className="p-2 bg-[#5FCDB2] text-white rounded cursor-pointer hover:bg-[#3EAD92]">
                     <TbReplace size={16} />
                     <input
                       type="file"

@@ -1,6 +1,10 @@
 @import "tailwindcss";
 :root {
-  --primary-gradient: linear-gradient(180deg, #e6ce65 0%, #7c5825 100%);
+  --primary-gradient: linear-gradient(
+    180deg,
+    rgba(166, 135, 62, 1) 0%,
+    rgba(129, 94, 39, 1) 100%
+  );
   --primary-text: #71717a;
 }
 .bg-primary {
