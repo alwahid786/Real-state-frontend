@@ -118,10 +118,10 @@ const UsersView = () => {
       name: "Email",
       selector: (row) => row.email,
     },
-    {
-      name: "Password",
-      selector: (row) => row.password,
-    },
+    // {
+    //   name: "Password",
+    //   selector: (row) => row.password,
+    // },
     {
       name: "Created At",
       selector: (row) => row.createdAt,

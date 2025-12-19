@@ -7,6 +7,7 @@ const Button = ({
   onClick,
   children,
   type = "button",
+  ...rest
 }) => {
   return (
     <button
@@ -23,6 +24,7 @@ const Button = ({
         hover:opacity-90
         ${cn}
       `}
+      {...rest}
     >
       {icon && (
         <span className="text-lg leading-none flex items-center">{icon}</span>

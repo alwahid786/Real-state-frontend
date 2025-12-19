@@ -20,7 +20,7 @@ const Input = ({ label, cn = "", noActiveRed = false, ...props }) => {
           onFocus={() => setActive(true)}
           onBlur={() => setActive(false)}
           className={`
-            w-full h-[48px] px-4
+            w-full h-12 px-4
             border ${borderColor} rounded-md
             outline-none text-sm
             ${cn}

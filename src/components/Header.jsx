@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { HiOutlineBars3CenterLeft } from "react-icons/hi2";
-import profilePic from "../assets/profile.jpg";
 import Aside from "./Aside";
 import { useSelector } from "react-redux";
+import { getUserInitial, getAvatarColor } from "../utils/avatar";
 
 const routeTitles = {
   "/create-new-comp": "Create New Comp.",
@@ -17,6 +17,19 @@ const Header = () => {
   const { user } = useSelector((state) => state.auth);
 
   const currentTab = routeTitles[location.pathname] || "Create New Comp.";
+  // const getUserInitial = () => {
+  //   if (user?.name && user.name.trim().length > 0) {
+  //     return user.name.trim().charAt(0).toUpperCase();
+  //   }
+
+  //   if (user?.email && user.email.trim().length > 0) {
+  //     return user.email.trim().charAt(0).toUpperCase();
+  //   }
+
+  //   return "U";
+  // };
+  const initial = getUserInitial(user);
+  const avatarColor = getAvatarColor(initial);
 
   return (
     <header className="flex h-18.5 items-center justify-between gap-4 rounded-lg bg-white p-4 lg:px-7 lg:py-4 shadow-sm">
@@ -34,11 +47,12 @@ const Header = () => {
 
       {/* Profile */}
       <div className="flex gap-3 items-center">
-        <img
-          src={profilePic}
-          alt="Profile"
-          className="rounded-full w-9 h-9 sm:w-10 sm:h-10 object-cover"
-        />
+        <div
+          className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center font-semibold text-sm sm:text-base ${avatarColor}`}
+        >
+          {initial}
+        </div>
+
         <div className="hidden md:flex flex-col gap-1">
           <h3 className="text-[18px] text-primary">{user?.name || "—"}</h3>
           <p className="text-[10px] text-primary">{user?.email || "—"}</p>

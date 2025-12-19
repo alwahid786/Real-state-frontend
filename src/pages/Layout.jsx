@@ -14,7 +14,7 @@ const Layout = () => {
         </div>
         <div className="flex-1">
           <Header />
-          <main className="overflow-y-scroll scroll-0 overflow-x-hidden mt-5 rounded-lg h-[calc(100vh-110px)]">
+          <main className="overflow-y-scroll scroll-0 overflow-x-visible mt-5 rounded-lg h-[calc(100vh-110px)]">
             <Outlet />
           </main>
         </div>

@@ -39,7 +39,7 @@ const Location = () => {
   };
 
   return (
-    <div className="h-[400px] w-full rounded-md overflow-hidden">
+    <div className="h-100 w-full rounded-md overflow-hidden">
       <MapContainer
         center={position}
         zoom={15}
