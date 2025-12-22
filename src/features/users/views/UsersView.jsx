@@ -209,7 +209,7 @@ const UsersView = () => {
                 <Input
                   type="text"
                   name="firstName"
-                  placeholder="First Name"
+                  placeholder="Enter First Name"
                   value={formData.firstName}
                   onChange={(e) =>
                     setFormData({ ...formData, firstName: e.target.value })
@@ -223,7 +223,7 @@ const UsersView = () => {
                 <Input
                   type="text"
                   name="lastName"
-                  placeholder="Last Name"
+                  placeholder="Enter Last Name"
                   value={formData.lastName}
                   onChange={(e) =>
                     setFormData({ ...formData, lastName: e.target.value })
@@ -237,7 +237,7 @@ const UsersView = () => {
                 <Input
                   type="email"
                   name="email"
-                  placeholder="Email"
+                  placeholder="Enter Email"
                   value={formData.email}
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })

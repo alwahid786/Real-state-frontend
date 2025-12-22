@@ -70,7 +70,7 @@ const ResetPasswordView = () => {
           </p>
         </div>
 
-        <div className="mt-3 ml-3 sm:mt-5 md:ml-2 w-6 sm:w-10">
+        <div className="mt-3 ml-2 sm:mt-5 md:ml-6 w-6 sm:w-10">
           <Link to={"/reset-password"}>
             <BackIcon />
           </Link>

@@ -81,7 +81,8 @@ const MainView = () => {
                 name="bedrooms"
                 value={formData.bedrooms}
                 onChange={handleChange}
-                placeholder="No. of Bedrooms"
+                placeholder="4"
+                type="number"
                 className="border p-2 rounded"
               />
             </div>
@@ -91,7 +92,8 @@ const MainView = () => {
                 name="bathrooms"
                 value={formData.bathrooms}
                 onChange={handleChange}
-                placeholder="Bathrooms"
+                placeholder="5"
+                type="number"
                 className="border p-2 rounded"
               />
             </div>
