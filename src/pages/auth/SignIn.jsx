@@ -3,9 +3,11 @@ import { useLoginMutation } from "../../features/auth/rtk/authApis";
 import { userExist } from "../../features/auth/rtk/authSlice";
 import { useDispatch } from "react-redux";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const SignIn = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [loginUser, { isLoading }] = useLoginMutation();
   const handleLoginUser = async (email, password) => {
     try {
@@ -17,6 +19,7 @@ const SignIn = () => {
       if (res.success) {
         toast.success(res.message || "Login successful!");
         dispatch(userExist(res.data));
+        navigate("/users");
       }
     } catch (error) {
       console.error("Login failed:", error);

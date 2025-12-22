@@ -49,7 +49,7 @@ const App = () => {
         <Spinner size={60} />
       ) : (
         <Routes>
-          <Route element={<ProtectedRoute user={!user} redirectUrl="/" />}>
+          <Route element={<ProtectedRoute user={!user} redirectUrl="/users" />}>
             <Route path="/sign-in" element={<SignIn />} />
             <Route path="/forget-password" element={<ForgetPassword />} />
             <Route path="/reset-password/:token" element={<ResetPassword />} />

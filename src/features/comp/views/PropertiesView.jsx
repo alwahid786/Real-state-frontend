@@ -8,16 +8,24 @@ import PlusIcon from "../../../assets/SVG/PlusIcon";
 const PropertiesView = () => {
   const columns = [
     {
-      name: "Name",
-      selector: (row) => row.name,
+      name: "Property Name",
+      selector: (row) => row.propertyName,
     },
     {
-      name: "Email",
-      selector: (row) => row.email,
+      name: "Type",
+      selector: (row) => row.type,
     },
     {
-      name: "Phone No.",
-      selector: (row) => row.phone,
+      name: "Street Address",
+      selector: (row) => row.street,
+    },
+    {
+      name: "City",
+      selector: (row) => row.city,
+    },
+    {
+      name: "Price",
+      selector: (row) => row.price,
     },
     {
       name: "Created At",
@@ -51,28 +59,34 @@ const PropertiesView = () => {
   const data = [
     {
       id: 1,
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "+1 234 567 890",
-      createdAt: "12 Sep 2024",
+      propertyName: "Grand Height",
+      type: "Apartment",
+      street: "Elite Town",
+      city: "London",
+      price: "£27000",
+      createdAt: "08-12-2025",
       status: "Active",
     },
 
     {
       id: 2,
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "+1 234 567 890",
-      createdAt: "12 Sep 2024",
-      status: "Pending",
+      propertyName: "William Villa",
+      type: "House",
+      street: "Silicon Town",
+      city: "Manchester",
+      price: "£27000",
+      createdAt: "08-12-2025",
+      status: "pending",
     },
     {
       id: 3,
-      name: "John Doe",
-      email: "john@example.com",
-      phone: "+1 234 567 890",
-      createdAt: "12 Sep 2024",
-      status: "Pending",
+      propertyName: "Grover Sweet",
+      type: "Apartment",
+      street: "Wolf Valley",
+      city: "London",
+      price: "£27000",
+      createdAt: "08-12-2025",
+      status: "Active",
     },
   ];
 
@@ -80,9 +94,7 @@ const PropertiesView = () => {
     <div className=" rounded-lg p-4 bg-white ">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
         <div>
-          <h1 className="text-xl font-medium text-[#09090B] ">
-            User Management
-          </h1>
+          <h1 className="text-xl font-medium text-[#09090B] ">History</h1>
         </div>
         <div className="mt-2 sm:mt-0">
           <Button text="Create New Comp." cn="px-4 py-2" icon={<PlusIcon />} />

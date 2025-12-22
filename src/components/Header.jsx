@@ -6,8 +6,8 @@ import { useSelector } from "react-redux";
 import { getUserInitial, getAvatarColor } from "../utils/avatar";
 
 const routeTitles = {
-  "/create-new-comp": "Main",
   "/users": "Users",
+  "/create-new-comp": "Main",
   "/history": "Properties",
 };
 
@@ -17,17 +17,6 @@ const Header = () => {
   const { user } = useSelector((state) => state.auth);
 
   const currentTab = routeTitles[location.pathname] || "Main";
-  // const getUserInitial = () => {
-  //   if (user?.name && user.name.trim().length > 0) {
-  //     return user.name.trim().charAt(0).toUpperCase();
-  //   }
-
-  //   if (user?.email && user.email.trim().length > 0) {
-  //     return user.email.trim().charAt(0).toUpperCase();
-  //   }
-
-  //   return "U";
-  // };
   const initial = getUserInitial(user);
   const avatarColor = getAvatarColor(initial);
 
@@ -39,7 +28,7 @@ const Header = () => {
           <HiOutlineBars3CenterLeft size={27} className="text-gold-400" />
         </button>
         <div>
-          <h2 className="text-dark-text text-xl lg:text-2xl font-medium capitalize truncate w-37.5 md:w-full">
+          <h2 className="text-dark-text text-xl lg:text-[24px] font-medium capitalize truncate w-37.5 md:w-full">
             {currentTab}
           </h2>
         </div>
@@ -54,7 +43,7 @@ const Header = () => {
         </div>
 
         <div className="hidden md:flex flex-col gap-1">
-          <h3 className="text-[18px] text-primary">{user?.name || "—"}</h3>
+          <h3 className="text-[14px] text-primary">{user?.name || "—"}</h3>
           <p className="text-[10px] text-primary">{user?.email || "—"}</p>
         </div>
       </div>

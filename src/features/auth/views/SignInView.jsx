@@ -43,7 +43,9 @@ const SignInView = ({ handleLoginUser, isLoading }) => {
       {/* Content Section */}
       <div className="w-full lg:w-1/2 flex items-center justify-center bg-white px-4 sm:px-6 py-10 lg:rounded-l-[40px]">
         <form className="w-full max-w-md">
-          <h2 className="text-xl font-semibold text-center mb-1">Sign In</h2>
+          <h2 className="text-[24px] font-semibold text-center mb-1">
+            Sign In
+          </h2>
           <p className="text-sm text-gray-500 text-center mb-8">
             Log in to your account.
           </p>

@@ -6,7 +6,6 @@ import LogoutIcon from "../../src/assets/SVG/LogoutIcon";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 // Logo
 import Logo from "/Logo.png";
-import { Link } from "react-router-dom";
 import { useState } from "react";
 import { useLogoutMutation } from "../features/auth/rtk/authApis";
 import { FiLoader } from "react-icons/fi";
@@ -14,8 +13,7 @@ import { useDispatch } from "react-redux";
 import { userNotExist } from "../features/auth/rtk/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-
-// const tabs = [ "Create New Comp.", "Users", "History"];
+import { NavLink } from "react-router-dom";
 
 const pages = [
   {
@@ -79,6 +77,7 @@ const Aside = () => {
         <div className="flex items-center gap-3 p-4">
           <img
             src={Logo}
+            alt="Logo"
             className={`h-16 w-auto transition-all duration-300 ${
               isOpen ? "opacity-100" : "opacity-0"
             }`}
@@ -89,46 +88,47 @@ const Aside = () => {
         <div className="border-y-2 border-[#F6F6F6] p-2 py-4 flex-1">
           <div className="flex flex-col gap-2">
             {pages.map((page) => (
-              <Link to={page.link[0]} key={page.id}>
-                <div
-                  className={`flex items-center rounded-lg p-3 text-[#71717A] hover-primary-gradient hover:text-white ${
-                    isOpen ? "gap-3 justify-start" : "justify-center"
-                  }`}
-                >
-                  {page.icon}
+              <NavLink
+                key={page.id}
+                to={page.link[0]}
+                className={({ isActive }) =>
+                  `flex items-center rounded-lg p-3 transition-all duration-200
+                  ${isOpen ? "gap-3 justify-start" : "justify-center"}
+                  ${
+                    isActive
+                      ? "bg-primary text-white"
+                      : "text-[#71717A] hover-primary-gradient hover:text-white"
+                  }`
+                }
+              >
+                {page.icon}
 
-                  {isOpen && (
-                    <span className="text-sm font-medium whitespace-nowrap">
-                      {page.title}
-                    </span>
-                  )}
-                </div>
-              </Link>
+                {isOpen && (
+                  <span className="text-sm font-medium whitespace-nowrap">
+                    {page.title}
+                  </span>
+                )}
+              </NavLink>
             ))}
           </div>
         </div>
 
-        {/* logout */}
+        {/* Logout */}
         <div className="p-2">
           <button
             disabled={isLoading}
-            className={`flex w-full cursor-pointer items-center rounded-lg p-3 transition-all duration-200 text-[#D55F5A] hover:text-white ${
-              isOpen ? "gap-3 justify-start" : "justify-center"
-            }  hover-primary-gradient hover:text-white`}
             onClick={logoutHandler}
+            className={`flex w-full items-center rounded-lg p-3 transition-all duration-200 text-[#D55F5A]
+              ${isOpen ? "gap-3 justify-start" : "justify-center"}
+              hover-primary-gradient hover:text-white`}
           >
-            <span className="flex items-center gap-2">
-              {isLoading ? (
-                <FiLoader className="animate-spin" />
-              ) : (
-                <LogoutIcon />
-              )}
-              {isOpen && (
-                <span className="text-sm  font-medium whitespace-nowrap">
-                  Logout
-                </span>
-              )}
-            </span>
+            {isLoading ? <FiLoader className="animate-spin" /> : <LogoutIcon />}
+
+            {isOpen && (
+              <span className="text-sm font-medium whitespace-nowrap">
+                Logout
+              </span>
+            )}
           </button>
         </div>
       </div>

@@ -47,7 +47,7 @@ const UploadMedia = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      <h3 className="text-xl font-semibold text-primary">Upload Media</h3>
+      <h3 className="text-xl font-semibold text-primary">Media Uploads</h3>
 
       <div onDrop={handleDrop} onDragOver={handleDragOver}>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">

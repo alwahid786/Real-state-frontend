@@ -101,7 +101,7 @@ const MainView = () => {
                 name="portions"
                 value={formData.portions}
                 onChange={handleChange}
-                placeholder="No. of Portions"
+                placeholder="1"
                 type="number"
                 className="border p-2 rounded"
               />
