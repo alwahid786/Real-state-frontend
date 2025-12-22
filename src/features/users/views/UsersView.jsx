@@ -16,7 +16,7 @@ import {
 } from "../rtk/userApis";
 import { toast } from "react-toastify";
 import { FiLoader } from "react-icons/fi";
-const emailRegex = /^[^\s@]+@[^\s@]+\.com$/i;
+const emailRegex = /^[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*@gmail\.com$/i;
 const UsersView = () => {
   const [isDeletingUser, setIsDeletingUser] = useState(null);
   // RTK Query Hooks
