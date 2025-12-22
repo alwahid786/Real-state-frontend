@@ -24,8 +24,8 @@ const Modal = ({ title, onClose, children, width, cn }) => {
       style={{ opacity: isVisible ? 1 : 0 }}
     >
       <div
-        className={`bg-white rounded-t-[20px] !rounded-lg shadow-lg p-4 md:p-6 overflow-y-scroll h-fit max-h-[90vh] scroll-0 transition-transform duration-300 ease-in-out ${
-          width ? width : "w-[300px] md:w-[600px] lg:w-[900px] xl:w-[1200px]"
+        className={`bg-white rounded-t-[20px] rounded-lg! shadow-lg p-4 md:p-6 h-fit max-h-[90vh] scroll-0 transition-transform duration-300 ease-in-out ${
+          width ? width : "w-75 md:w-150 lg:w-225 xl:w-300"
         }${cn || ""}`}
         onClick={(e) => e.stopPropagation()}
         style={{ transform: isVisible ? "translateY(0)" : "translateY(100%)" }}
