@@ -134,7 +134,7 @@ const UsersView = () => {
     // },
     {
       name: "Created At",
-      selector: (row) => row.createdAt,
+      selector: (row) => row.createdAt.split("T")[0],
     },
     {
       name: "Roles",
