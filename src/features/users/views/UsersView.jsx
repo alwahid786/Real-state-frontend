@@ -16,6 +16,7 @@ import {
 } from "../rtk/userApis";
 import { toast } from "react-toastify";
 import { FiLoader } from "react-icons/fi";
+const emailRegex = /^[^\s@]+@[^\s@]+\.com$/i;
 const UsersView = () => {
   const [isDeletingUser, setIsDeletingUser] = useState(null);
   // RTK Query Hooks
@@ -34,47 +35,56 @@ const UsersView = () => {
   const [editingUserId, setEditingUserId] = useState(null);
   // Handlers
   const handleSave = async () => {
+    // Mandatory fields check
     if (!formData.firstName || !formData.lastName || !formData.email) {
       toast.error("Please fill all required fields");
       return;
     }
 
+    // Email format check
+    if (!emailRegex.test(formData.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
     try {
       if (editingUserId) {
-        // Edit
+        // Edit user
         const res = await editUser({
           id: editingUserId,
           data: {
             name: `${formData.firstName} ${formData.lastName}`,
             email: formData.email,
-            password: formData.password,
+            // password: formData.password,
           },
         }).unwrap();
+
         if (res.success) {
           toast.success("User updated successfully!");
         }
       } else {
-        // Create
+        // Create user
         const res = await createUser({
           ...formData,
           name: `${formData.firstName} ${formData.lastName}`,
         }).unwrap();
+
         if (res.success) {
           toast.success("User created successfully!");
         }
       }
 
+      // Reset form
       setIsModalOpen(false);
       setEditingUserId(null);
       setFormData({
         firstName: "",
         lastName: "",
         email: "",
-        // password: "12345678",
+        // password: "",
         phone: "",
       });
     } catch (error) {
-      console.error("Error saving user:", error);
       toast.error(
         error.data?.message || "Failed to save user. Please try again."
       );
@@ -214,6 +224,7 @@ const UsersView = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, firstName: e.target.value })
                   }
+                  required
                 />
               </div>
               <div>
@@ -228,6 +239,7 @@ const UsersView = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, lastName: e.target.value })
                   }
+                  required
                 />
               </div>
               <div>
@@ -242,6 +254,7 @@ const UsersView = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
+                  required
                 />
               </div>
               {/* <div>

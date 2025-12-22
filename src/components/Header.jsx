@@ -50,7 +50,7 @@ const Header = () => {
 
       {/* Mobile Aside  */}
       <div
-        className={`block xl:hidden fixed inset-0 bg-[#00000071] z-50 transition-all duration-500 ${
+        className={`block xl:hidden fixed inset-0  z-50 transition-all duration-500 ${
           mobileNav
             ? "visible opacity-100"
             : "invisible opacity-0 pointer-events-none"

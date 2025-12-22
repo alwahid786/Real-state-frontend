@@ -77,7 +77,7 @@ const SignInView = ({ handleLoginUser, isLoading }) => {
               id="password"
               name="password"
               type="password"
-              placeholder="password"
+              placeholder="Password"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />

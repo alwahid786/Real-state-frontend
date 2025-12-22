@@ -60,7 +60,14 @@ const App = () => {
             <Route element={<ProtectedRoute user={user} />}>
               <Route path="/" element={<Main />} />
               <Route path="/create-new-comp" element={<Main />} />
-              <Route path="/users" element={<Users />} />
+              <Route
+                path="/users"
+                element={
+                  <ProtectedRoute user={user} allowedRoles={["admin"]}>
+                    <Users />
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/history" element={<Properties />} />
             </Route>
           </Route>

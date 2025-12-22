@@ -83,6 +83,7 @@ const MainView = () => {
                 onChange={handleChange}
                 placeholder="4"
                 type="number"
+                min={1}
                 className="border p-2 rounded"
               />
             </div>
@@ -94,6 +95,7 @@ const MainView = () => {
                 onChange={handleChange}
                 placeholder="5"
                 type="number"
+                min={1}
                 className="border p-2 rounded"
               />
             </div>
@@ -105,6 +107,7 @@ const MainView = () => {
                 onChange={handleChange}
                 placeholder="1"
                 type="number"
+                min={0}
                 className="border p-2 rounded"
               />
             </div>
@@ -116,6 +119,7 @@ const MainView = () => {
                 onChange={handleChange}
                 placeholder="4000"
                 type="number"
+                min={0}
                 className="border p-2 rounded"
               />
             </div>
@@ -173,6 +177,8 @@ const MainView = () => {
             value={formData.price}
             onChange={handleChange}
             placeholder="$200,000"
+            type="number"
+            min={0}
             className="border p-2 rounded w-full"
           />
         </div>

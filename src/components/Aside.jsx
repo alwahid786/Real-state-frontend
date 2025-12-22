@@ -9,7 +9,7 @@ import Logo from "/Logo.png";
 import { useState } from "react";
 import { useLogoutMutation } from "../features/auth/rtk/authApis";
 import { FiLoader } from "react-icons/fi";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { userNotExist } from "../features/auth/rtk/authSlice";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -41,6 +41,12 @@ const Aside = () => {
   const dispatch = useDispatch();
   const [isOpen, setIsOpen] = useState(true);
   const [logout, { isLoading }] = useLogoutMutation();
+
+  const currentUser = useSelector((state) => state.auth.user);
+  const filteredPages = pages.filter((page) => {
+    if (page.title === "Users" && currentUser?.role !== "admin") return false;
+    return true;
+  });
 
   const logoutHandler = async () => {
     try {
@@ -87,22 +93,21 @@ const Aside = () => {
         {/* Menu */}
         <div className="border-y-2 border-[#F6F6F6] p-2 py-4 flex-1">
           <div className="flex flex-col gap-2">
-            {pages.map((page) => (
+            {filteredPages.map((page) => (
               <NavLink
                 key={page.id}
                 to={page.link[0]}
                 className={({ isActive }) =>
                   `flex items-center rounded-lg p-3 transition-all duration-200
-                  ${isOpen ? "gap-3 justify-start" : "justify-center"}
-                  ${
-                    isActive
-                      ? "bg-primary text-white"
-                      : "text-[#71717A] hover-primary-gradient hover:text-white"
-                  }`
+                     ${isOpen ? "gap-3 justify-start" : "justify-center"}
+                     ${
+                       isActive
+                         ? "bg-primary text-white"
+                         : "text-[#71717A] hover-primary-gradient hover:text-white"
+                     }`
                 }
               >
                 {page.icon}
-
                 {isOpen && (
                   <span className="text-sm font-medium whitespace-nowrap">
                     {page.title}

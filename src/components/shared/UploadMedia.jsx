@@ -17,6 +17,7 @@ const UploadMedia = () => {
 
   const handleManualAdd = (e) => {
     handleFiles(e.target.files);
+    e.target.value = null;
   };
 
   const handleDrop = (e) => {
