@@ -16,7 +16,8 @@ import {
 } from "../rtk/userApis";
 import { toast } from "react-toastify";
 import { FiLoader } from "react-icons/fi";
-const emailRegex = /^[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*@gmail\.com$/i;
+const emailRegex =
+  /^[a-zA-Z0-9]+([._]?[a-zA-Z0-9]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z]{2,})+$/;
 const UsersView = () => {
   const [isDeletingUser, setIsDeletingUser] = useState(null);
   // RTK Query Hooks
@@ -128,14 +129,17 @@ const UsersView = () => {
       name: "Email",
       selector: (row) => row.email,
     },
-    // {
-    //   name: "Password",
-    //   selector: (row) => row.password,
-    // },
     {
       name: "Created At",
-      selector: (row) => row.createdAt.split("T")[0],
+      selector: (row) => {
+        const d = new Date(row.createdAt);
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        return `${day}-${month}-${year}`;
+      },
     },
+
     {
       name: "Roles",
       cell: (row) => (
