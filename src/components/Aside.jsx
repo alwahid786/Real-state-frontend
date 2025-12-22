@@ -64,7 +64,7 @@ const Aside = () => {
 
   return (
     <aside
-      className={`h-[calc(100vh-16px)] bg-white rounded-lg relative transition-all duration-300 ${
+      className={`h-svh sm:h-[calc(100vh-16px)] bg-white rounded-lg relative transition-all duration-300 ${
         isOpen ? "w-64" : "w-16"
       }`}
     >
@@ -80,7 +80,7 @@ const Aside = () => {
 
       <div className="h-full flex flex-col">
         {/* Logo */}
-        <div className="flex items-center gap-3 p-4">
+        <div className="flex items-center gap-3 p-4 shrink-0">
           <img
             src={Logo}
             alt="Logo"
@@ -90,8 +90,7 @@ const Aside = () => {
           />
         </div>
 
-        {/* Menu */}
-        <div className="border-y-2 border-[#F6F6F6] p-2 py-4 flex-1">
+        <div className="flex-1 overflow-y-auto border-y-2 border-[#F6F6F6] p-2 py-4">
           <div className="flex flex-col gap-2">
             {filteredPages.map((page) => (
               <NavLink
@@ -99,12 +98,12 @@ const Aside = () => {
                 to={page.link[0]}
                 className={({ isActive }) =>
                   `flex items-center rounded-lg p-3 transition-all duration-200
-                     ${isOpen ? "gap-3 justify-start" : "justify-center"}
-                     ${
-                       isActive
-                         ? "bg-primary text-white"
-                         : "text-[#71717A] hover-primary-gradient hover:text-white"
-                     }`
+              ${isOpen ? "gap-3 justify-start" : "justify-center"}
+              ${
+                isActive
+                  ? "bg-primary text-white"
+                  : "text-[#71717A] hover-primary-gradient hover:text-white"
+              }`
                 }
               >
                 {page.icon}
@@ -118,19 +117,19 @@ const Aside = () => {
           </div>
         </div>
 
-        {/* Logout */}
-        <div className="p-2">
+        {/* Logout*/}
+        <div className="sticky bottom-0 bg-white p-2 border-t border-[#F6F6F6] shrink-0">
           <button
             disabled={isLoading}
             onClick={logoutHandler}
-            className={`flex w-full items-center rounded-lg p-3 transition-all duration-200 text-[#D55F5A]
-              ${isOpen ? "gap-3 justify-start" : "justify-center"}
-              hover-primary-gradient hover:text-white`}
+            className={`flex w-full items-center rounded-lg cursor-pointer p-3 transition-all duration-200 text-[#D55F5A]
+          ${isOpen ? "gap-3 justify-start" : "justify-center"}
+          hover-primary-gradient hover:text-white`}
           >
             {isLoading ? <FiLoader className="animate-spin" /> : <LogoutIcon />}
 
             {isOpen && (
-              <span className="text-sm font-medium whitespace-nowrap">
+              <span className="text-sm font-medium whitespace-nowrap ">
                 Logout
               </span>
             )}
