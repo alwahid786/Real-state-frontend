@@ -183,7 +183,7 @@ const UsersView = () => {
   ];
 
   return (
-    <div className=" border-[#71717A] rounded-lg p-4 bg-white ">
+    <div className=" border border-[#E4E4E7] rounded-lg p-4 bg-white ">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4">
         <div>
           <h1 className="text-xl font-medium text-[#09090B] ">

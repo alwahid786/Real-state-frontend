@@ -3,7 +3,7 @@ import HomeIcon from "../../src/assets/SVG/HomeIcon";
 import HistoryIcon from "../../src/assets/SVG/HistoryIcon";
 import UserIcon from "../../src/assets/SVG/UserIcon";
 import LogoutIcon from "../../src/assets/SVG/LogoutIcon";
-import { MdKeyboardArrowLeft } from "react-icons/md";
+import { MdKeyboardArrowRight } from "react-icons/md";
 // Logo
 import Logo from "/Logo.png";
 import { useState } from "react";
@@ -75,7 +75,7 @@ const Aside = () => {
         }`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <MdKeyboardArrowLeft className="text-lg text-white" />
+        <MdKeyboardArrowRight className="text-lg text-white" />
       </div>
 
       <div className="h-full flex flex-col">
@@ -130,7 +130,7 @@ const Aside = () => {
 
             {isOpen && (
               <span className="text-sm font-medium whitespace-nowrap ">
-                Logout
+                Logout Account
               </span>
             )}
           </button>

@@ -8,7 +8,7 @@ const DataTable = ({ columns = [], data = [], pageSize = 10 }) => {
   const currentData = data.slice(startIndex, startIndex + pageSize);
 
   return (
-    <div className="w-full bg-white rounded-lg p-1 ">
+    <div className="w-full border border-[#E4E4E7] bg-white rounded-lg p-1 ">
       <div className="hidden md:block overflow-x-auto">
         <table className="min-w-full">
           <thead>
@@ -29,7 +29,7 @@ const DataTable = ({ columns = [], data = [], pageSize = 10 }) => {
               currentData.map((row, rowIndex) => (
                 <tr
                   key={rowIndex}
-                  className="border-t border-[#71717A] hover:bg-gray-50"
+                  className="border-t border-[#E4E4E7] hover:bg-gray-50"
                 >
                   {columns.map((col, colIndex) => (
                     <td
@@ -60,7 +60,7 @@ const DataTable = ({ columns = [], data = [], pageSize = 10 }) => {
           currentData.map((row, rowIndex) => (
             <div
               key={rowIndex}
-              className="border border-[#71717A] rounded-lg p-4 shadow-sm"
+              className="border border-[#E4E4E7] rounded-lg p-4 shadow-sm"
             >
               {columns.map((col, colIndex) => (
                 <div key={colIndex} className="flex justify-between gap-3 py-1">
