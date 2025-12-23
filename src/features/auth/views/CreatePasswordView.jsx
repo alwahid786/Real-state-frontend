@@ -23,15 +23,30 @@ const ResetPasswordView = () => {
   // password legnth
   const getPasswordStrength = (pwd) => {
     if (!pwd) return "";
-    if (pwd.length < 6) return "Weak";
-    if (pwd.length < 10) return "Medium";
+
+    const hasNumber = /\d/.test(pwd);
+    const hasSpecial = /[!@#$%^&*]/.test(pwd);
+
+    if (pwd.length < 8) return "Weak";
+    if (pwd.length >= 8 && (!hasNumber || !hasSpecial)) return "Medium";
+
     return "Strong";
   };
 
   const resetPasswordHandler = async () => {
     try {
       if (!token || !createPassword || !confirmPassword) {
-        return toast.error("Please Enter All fields or try again");
+        return toast.error("Please enter all fields");
+      }
+
+      if (passwordStrength === "Weak") {
+        return toast.error(
+          "Password must be at least 8 characters with number & special character"
+        );
+      }
+
+      if (createPassword !== confirmPassword) {
+        return toast.error("Passwords do not match");
       }
       const res = await ResetPassowrd({
         token,
@@ -52,6 +67,7 @@ const ResetPasswordView = () => {
 
   const passwordsDoNotMatch =
     confirmPassword.length > 0 && createPassword !== confirmPassword;
+  const passwordStrength = getPasswordStrength(createPassword);
 
   return (
     <div>
@@ -94,14 +110,14 @@ const ResetPasswordView = () => {
                 {createPassword && (
                   <span
                     className={`text-xs underline font-medium ${
-                      getPasswordStrength(createPassword) === "Weak"
+                      passwordStrength === "Weak"
                         ? "text-red-500"
-                        : getPasswordStrength(createPassword) === "Medium"
+                        : passwordStrength === "Medium"
                         ? "text-orange-500"
                         : "text-green-500"
                     }`}
                   >
-                    {getPasswordStrength(createPassword)}
+                    {passwordStrength}
                   </span>
                 )}
               </div>
@@ -149,6 +165,11 @@ const ResetPasswordView = () => {
                 {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
             </div>
+            {passwordStrength === "Weak" && (
+              <p className="text-xs text-red-500 mt-1">
+                Minimum 8 characters, include 1 number & 1 special character
+              </p>
+            )}
 
             {passwordsDoNotMatch && (
               <p className="text-xs text-red-500 mb-5">
@@ -160,6 +181,12 @@ const ResetPasswordView = () => {
               onClick={resetPasswordHandler}
               text={"Reset Password"}
               cn={"h-[48px]"}
+              disabled={
+                passwordStrength === "Weak" ||
+                !createPassword ||
+                !confirmPassword ||
+                passwordsDoNotMatch
+              }
             />
           </div>
         </div>
