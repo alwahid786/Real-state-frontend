@@ -27,6 +27,7 @@ const UsersView = () => {
   const [editUser] = useEditUserMutation();
   // States
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [originalFormData, setOriginalFormData] = useState(null);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -36,6 +37,9 @@ const UsersView = () => {
   const [editingUserId, setEditingUserId] = useState(null);
   // Handlers
   const handleSave = async () => {
+    if (editingUserId && !hasFormChanged()) {
+      return;
+    }
     // Mandatory fields check
     if (!formData.firstName || !formData.lastName || !formData.email) {
       toast.error("Please fill all required fields");
@@ -108,15 +112,31 @@ const UsersView = () => {
       setIsDeletingUser(null);
     }
   };
+  const hasFormChanged = () => {
+    if (!editingUserId || !originalFormData) return true;
+
+    return (
+      formData.firstName !== originalFormData.firstName ||
+      formData.lastName !== originalFormData.lastName ||
+      formData.email !== originalFormData.email
+    );
+  };
 
   const handleEdit = (user) => {
-    setEditingUserId(user._id);
-    setFormData({
+    const userData = {
       firstName: user.name.split(" ")[0],
       lastName: user.name.split(" ")[1] || "",
       email: user.email,
-      // password: "",
-    });
+    };
+    setEditingUserId(user._id);
+    // setFormData({
+    //   firstName: user.name.split(" ")[0],
+    //   lastName: user.name.split(" ")[1] || "",
+    //   email: user.email,
+    //   // password: "",
+    // });
+    setFormData(userData);
+    setOriginalFormData(userData);
     setIsModalOpen(true);
   };
   // Table Columns
@@ -204,6 +224,7 @@ const UsersView = () => {
                 phone: "",
               });
               setEditingUserId(null);
+              setOriginalFormData(null);
               setIsModalOpen(true);
             }}
           />
@@ -279,7 +300,11 @@ const UsersView = () => {
               <div className="flex justify-end">
                 <Button
                   text={editingUserId ? "Update User" : "Send Invitation"}
-                  cn="text-white px-4 py-2 !w-auto"
+                  cn={`text-white px-4 py-2 !w-auto transition-opacity duration-200 ${
+                    editingUserId && !hasFormChanged()
+                      ? "opacity-30 pointer-events-none"
+                      : "opacity-100"
+                  }`}
                   full
                   width
                   onClick={handleSave}
