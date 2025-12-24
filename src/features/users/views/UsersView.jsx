@@ -276,7 +276,10 @@ const UsersView = () => {
                   name="email"
                   placeholder="Enter Email"
                   value={formData.email}
-                  disabled
+                  disabled={editingUserId !== null}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   required
                 />
               </div>
