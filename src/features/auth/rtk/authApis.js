@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-const BaseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:4001";
+const BaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000/api";
 const authApis = createApi({
   reducerPath: "authApis",
   baseQuery: fetchBaseQuery({

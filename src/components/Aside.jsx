@@ -4,6 +4,7 @@ import HistoryIcon from "../../src/assets/SVG/HistoryIcon";
 import UserIcon from "../../src/assets/SVG/UserIcon";
 import LogoutIcon from "../../src/assets/SVG/LogoutIcon";
 import { MdKeyboardArrowRight } from "react-icons/md";
+import { HiMagnifyingGlass } from "react-icons/hi2";
 // Logo
 import Logo from "/Logo.png";
 import { useState } from "react";
@@ -18,18 +19,24 @@ import { NavLink } from "react-router-dom";
 const pages = [
   {
     id: 1,
+    title: "Property Search",
+    link: ["/property-search"],
+    icon: <HiMagnifyingGlass size={20} />,
+  },
+  {
+    id: 2,
     title: "Create New Comp.",
     link: ["/create-new-comp"],
     icon: <HomeIcon />,
   },
   {
-    id: 2,
+    id: 3,
     title: "Users",
     link: ["/users"],
     icon: <UserIcon />,
   },
   {
-    id: 3,
+    id: 4,
     title: "History",
     link: ["/history"],
     icon: <HistoryIcon />,

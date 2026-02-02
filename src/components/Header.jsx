@@ -6,6 +6,9 @@ import Aside from "./Aside";
 import { getUserInitial, getAvatarColor } from "../utils/avatar";
 
 const routeTitles = {
+  "/property-search": "Property Search",
+  "/property-details": "Property Details",
+  "/analysis-results": "Analysis Results",
   "/users": "Users",
   "/create-new-comp": "Main",
   "/history": "Properties",

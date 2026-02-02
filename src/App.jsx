@@ -1,5 +1,5 @@
 import Users from "../src/pages/users/Users";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Layout from "./pages/Layout";
 import SignIn from "./pages/auth/SignIn";
 import Main from "./pages/comp/Main";
@@ -14,6 +14,9 @@ import { useState } from "react";
 import Spinner from "./components/shared/Spinner";
 import ForgetPassword from "./pages/auth/ForgetPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
+import PropertySearch from "./pages/propertyComps/PropertySearch";
+import PropertyDetails from "./pages/propertyComps/PropertyDetails";
+import AnalysisResults from "./pages/propertyComps/AnalysisResults";
 
 const App = () => {
   const [loading, setLoading] = useState(true);
@@ -33,7 +36,7 @@ const App = () => {
           }
         }
       } catch (error) {
-        userNotExist();
+        dispatch(userNotExist());
         console.error("Failed to fetch user profile:", error);
       } finally {
         setLoading(false);
@@ -57,20 +60,26 @@ const App = () => {
 
           {/*  Layout Routes */}
           <Route element={<Layout />}>
-            <Route element={<ProtectedRoute user={user} />}>
+            <Route element={<ProtectedRoute user={user} redirectUrl="/sign-in" />}>
               <Route path="/" element={<Main />} />
               <Route path="/create-new-comp" element={<Main />} />
               <Route
                 path="/users"
                 element={
-                  <ProtectedRoute user={user} allowedRoles={["admin"]}>
+                  <ProtectedRoute user={user} allowedRoles={["admin"]} redirectUrl="/sign-in">
                     <Users />
                   </ProtectedRoute>
                 }
               />
               <Route path="/history" element={<Properties />} />
+              {/* Property Comps Routes */}
+              <Route path="/property-search" element={<PropertySearch />} />
+              <Route path="/property-details" element={<PropertyDetails />} />
+              <Route path="/analysis-results" element={<AnalysisResults />} />
             </Route>
           </Route>
+          {/* Catch-all route - redirect to sign-in if not authenticated, otherwise to create-new-comp */}
+          <Route path="*" element={<Navigate to={user ? "/create-new-comp" : "/sign-in"} replace />} />
         </Routes>
       )}
     </Router>
