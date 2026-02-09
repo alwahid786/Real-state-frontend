@@ -39,10 +39,18 @@ const ResultsDashboard = ({
               <span className="font-medium">{property.propertyCategory}</span>
             </div>
           )}
-          {analysis?.conditionCategory && (
+          {(analysis?.conditionCategory || analysis?.repairExtent) && (
             <div>
               <span className="text-gray-600">Condition: </span>
-              <span className="font-medium">{analysis.conditionCategory}</span>
+              <span className="font-medium">
+                {analysis.repairExtent || (analysis.conditionCategory === "light-repairs" ? "Light repairs" : analysis.conditionCategory === "heavy-repairs" ? "Heavy repairs" : "Medium repairs")}
+              </span>
+            </div>
+          )}
+          {(analysis?.estimatedRepairs !== undefined && analysis?.estimatedRepairs !== null) && (
+            <div>
+              <span className="text-gray-600">Est. Repairs: </span>
+              <span className="font-medium">{formatCurrency(analysis.estimatedRepairs)}</span>
             </div>
           )}
           {property?.beds && (

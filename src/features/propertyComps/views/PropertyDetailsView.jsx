@@ -483,8 +483,8 @@ const PropertyDetailsView = () => {
         ...((selectedProperty.baths || selectedProperty.bathrooms || selectedProperty.bath) && {
           baths: Number(selectedProperty.baths || selectedProperty.bathrooms || selectedProperty.bath)
         }),
-        ...((selectedProperty.squareFootage || selectedProperty.square_footage || selectedProperty.sqft || selectedProperty.sq_ft || selectedProperty.area) && {
-          squareFootage: Number(selectedProperty.squareFootage || selectedProperty.square_footage || selectedProperty.sqft || selectedProperty.sq_ft || selectedProperty.area)
+        ...((selectedProperty.squareFootage || selectedProperty.square_footage || selectedProperty.sqft || selectedProperty.sq_ft || selectedProperty.area || selectedProperty.livingArea) && {
+          squareFootage: Number(selectedProperty.squareFootage || selectedProperty.square_footage || selectedProperty.sqft || selectedProperty.sq_ft || selectedProperty.area || selectedProperty.livingArea)
         }),
         ...((selectedProperty.lotSize || selectedProperty.lot_size || selectedProperty.lotSqft || selectedProperty.lot_sqft) && {
           lotSize: Number(selectedProperty.lotSize || selectedProperty.lot_size || selectedProperty.lotSqft || selectedProperty.lot_sqft)
@@ -494,6 +494,10 @@ const PropertyDetailsView = () => {
         }),
         ...((selectedProperty.price || selectedProperty.listPrice || selectedProperty.listingPrice || selectedProperty.askingPrice) && {
           price: Number(selectedProperty.price || selectedProperty.listPrice || selectedProperty.listingPrice || selectedProperty.askingPrice)
+        }),
+        ...((selectedProperty.estimatedValue || selectedProperty.zestimate) != null && {
+          estimatedValue: Number(selectedProperty.estimatedValue ?? selectedProperty.zestimate),
+          zestimate: Number(selectedProperty.zestimate ?? selectedProperty.estimatedValue)
         }),
         ...((selectedProperty.propertyType || selectedProperty.property_type || selectedProperty.type) && {
           propertyType: selectedProperty.propertyType || selectedProperty.property_type || selectedProperty.type
@@ -554,8 +558,8 @@ const PropertyDetailsView = () => {
 
       const response = await findComparables({
         propertyId: propertyIdForApi,
-        timeWindowMonths: 6,
-        maxResults: 20,
+        timeWindowMonths: 12,
+        maxResults: 1000,
         propertyData: propertyData,
       }).unwrap();
 

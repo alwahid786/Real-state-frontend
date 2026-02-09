@@ -56,7 +56,7 @@ const propertyCompsApis = createApi({
 
     // Find sold comparables for a property (NEW - Step 1 of new workflow)
     findComparables: builder.mutation({
-      query: ({ propertyId, timeWindowMonths = 6, maxResults = 20, propertyData }) => ({
+      query: ({ propertyId, timeWindowMonths = 12, maxResults = 1000, propertyData }) => ({
         url: `/comps/find/${propertyId}`,
         method: "POST",
         body: { timeWindowMonths, maxResults, propertyData },
