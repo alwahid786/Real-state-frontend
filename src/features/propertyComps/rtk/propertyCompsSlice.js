@@ -26,6 +26,8 @@ const propertyCompsSlice = createSlice({
     },
     // Selected property
     selectedProperty: null,
+    // User-uploaded images for the subject property (URLs from /property/upload-images). Shown instead of detail-actor images.
+    subjectUploadedImages: [],
     // Analysis
     analysis: {
       loading: false,
@@ -53,7 +55,17 @@ const propertyCompsSlice = createSlice({
       holdingCost: 0,
       closingCost: 0,
       wholesaleFee: 0,
-      maoRule: "70%",
+      maoRule: "sop",
+    },
+    // Repair estimate inputs (user-driven; total feeds maoInputs.estimatedRepairs)
+    repairInputs: {
+      rehabPerSqft: 25,
+      needsRoof: false,
+      roofCost: 19000,
+      needsAC: false,
+      acCost: 7500,
+      otherRepair: 0,
+      addBuffer: true,
     },
   },
   reducers: {
@@ -69,6 +81,9 @@ const propertyCompsSlice = createSlice({
     setSelectedProperty: (state, action) => {
       state.selectedProperty = action.payload;
     },
+    setSubjectUploadedImages: (state, action) => {
+      state.subjectUploadedImages = Array.isArray(action.payload) ? action.payload : [];
+    },
     setAnalysis: (state, action) => {
       state.analysis = {
         ...state.analysis,
@@ -83,6 +98,9 @@ const propertyCompsSlice = createSlice({
     },
     setMAOInputs: (state, action) => {
       state.maoInputs = { ...state.maoInputs, ...action.payload };
+    },
+    setRepairInputs: (state, action) => {
+      state.repairInputs = { ...state.repairInputs, ...action.payload };
     },
     setComparables: (state, action) => {
       state.comparables = {
@@ -114,6 +132,7 @@ const propertyCompsSlice = createSlice({
         count: 0,
       };
       state.selectedProperty = null;
+      state.subjectUploadedImages = [];
       state.analysis = {
         loading: false,
         error: null,
@@ -131,6 +150,22 @@ const propertyCompsSlice = createSlice({
         count: 0,
       };
       state.selectedCompIds = [];
+      state.maoInputs = {
+        estimatedRepairs: 0,
+        holdingCost: 0,
+        closingCost: 0,
+        wholesaleFee: 0,
+        maoRule: "sop",
+      };
+      state.repairInputs = {
+        rehabPerSqft: 25,
+        needsRoof: false,
+        roofCost: 19000,
+        needsAC: false,
+        acCost: 7500,
+        otherRepair: 0,
+        addBuffer: true,
+      };
     },
   },
 });
@@ -139,11 +174,13 @@ export const {
   setSearchFilters,
   setSearchResults,
   setSelectedProperty,
+  setSubjectUploadedImages,
   setAnalysis,
   setImageAnalyses,
   setComparables,
   setSelectedCompIds,
   setMAOInputs,
+  setRepairInputs,
   resetPropertyComps,
 } = propertyCompsSlice.actions;
 

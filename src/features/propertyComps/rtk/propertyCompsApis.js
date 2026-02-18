@@ -7,7 +7,7 @@ const propertyCompsApis = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: BaseUrl,
     credentials: "include",
-    prepareHeaders: (headers, { getState }) => {
+    prepareHeaders: (headers, { getState, endpoint }) => {
       // Get token from Redux state or localStorage
       const state = getState();
       const token =
@@ -18,7 +18,10 @@ const propertyCompsApis = createApi({
       if (token) {
         headers.set("authorization", `Bearer ${token}`);
       }
-      headers.set("content-type", "application/json");
+      // Let browser set Content-Type with boundary for multipart upload
+      if (endpoint !== "uploadPropertyImages") {
+        headers.set("content-type", "application/json");
+      }
       return headers;
     },
   }),
@@ -34,12 +37,22 @@ const propertyCompsApis = createApi({
       invalidatesTags: ["Property"],
     }),
 
-    // Search property by address (NEW - uses APIFY_ZILLOW_ACTOR_ID)
+    // Search property by address (uses address scraping actor)
     searchPropertyByAddress: builder.mutation({
       query: ({ address }) => ({
         url: "/property/search-by-address",
         method: "POST",
         body: { address },
+      }),
+      invalidatesTags: ["Property"],
+    }),
+
+    // Upload subject property images (multipart); returns { urls: string[] }
+    uploadPropertyImages: builder.mutation({
+      query: (formData) => ({
+        url: "/property/upload-images",
+        method: "POST",
+        body: formData,
       }),
       invalidatesTags: ["Property"],
     }),
@@ -66,10 +79,10 @@ const propertyCompsApis = createApi({
 
     // Analyze selected comps (NEW - Step 2 of new workflow, primary endpoint)
     analyzeSelectedComps: builder.mutation({
-      query: ({ propertyId, selectedCompIds, maoInputs }) => ({
+      query: ({ propertyId, selectedCompIds, maoInputs, subjectImages }) => ({
         url: "/comps/analyze-selected",
         method: "POST",
-        body: { propertyId, selectedCompIds, maoInputs },
+        body: { propertyId, selectedCompIds, maoInputs, subjectImages },
       }),
       invalidatesTags: ["Analysis", "Comparable", "ImageAnalysis"],
     }),
@@ -138,6 +151,7 @@ const propertyCompsApis = createApi({
 export const {
   useSearchPropertiesMutation,
   useSearchPropertyByAddressMutation,
+  useUploadPropertyImagesMutation,
   useFetchPropertyDetailsMutation,
   useFindComparablesMutation,
   useAnalyzeSelectedCompsMutation,

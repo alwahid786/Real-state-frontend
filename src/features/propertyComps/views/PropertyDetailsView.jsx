@@ -10,14 +10,14 @@ import {
   useGetImageAnalysesQuery,
   useFetchPropertyDetailsMutation,
 } from "../rtk/propertyCompsApis";
-import { setAnalysis, setImageAnalyses, setMAOInputs, setComparables, setSelectedCompIds, setSelectedProperty } from "../rtk/propertyCompsSlice";
+import { setAnalysis, setImageAnalyses, setMAOInputs, setRepairInputs, setComparables, setSelectedCompIds, setSelectedProperty } from "../rtk/propertyCompsSlice";
 import { toast } from "react-toastify";
 import { saveSelectedProperty, loadSelectedProperty, updatePropertyInSearchResults } from "../../../utils/localStorage";
 
 const PropertyDetailsView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { selectedProperty, maoInputs, comparables, selectedCompIds, searchFilters } = useSelector(
+  const { selectedProperty, maoInputs, repairInputs, comparables, selectedCompIds, searchFilters } = useSelector(
     (state) => state.propertyComps
   );
   const [findComparables, { isLoading: isFindingComps }] =
@@ -120,9 +120,14 @@ const PropertyDetailsView = () => {
                            Array.isArray(selectedProperty.images) && 
                            selectedProperty.images.length > 0;
       
-      // Only fetch if we don't have full details or images are missing
-      if (hasFullImages && selectedProperty.squareFootage && selectedProperty.lotSize) {
-        // Already have full details, mark as fetched and skip
+      // Skip fetch only if we have full details and we're not using user-uploaded images (user uploads => we still fetch to get beds/baths/sqft etc., then show user's images)
+      const hasUserUploadedImages = selectedProperty.uploadedImages?.length > 0;
+      if (
+        !hasUserUploadedImages &&
+        hasFullImages &&
+        selectedProperty.squareFootage &&
+        selectedProperty.lotSize
+      ) {
         fetchedPropertyRef.current = propertyIdentifier;
         console.log("✅ Property already has full details, skipping fetch");
         return;
@@ -154,26 +159,29 @@ const PropertyDetailsView = () => {
         const response = await fetchPropertyDetails(requestPayload).unwrap();
 
         if (response.success && response.property) {
-          // Build updated property object
+          // Show user-uploaded images instead of detail-actor images; keep all other data from the actor
+          const userImages = selectedProperty.uploadedImages;
+          const displayImages =
+            userImages && userImages.length > 0
+              ? userImages
+              : (response.images || response.property.images || []);
+
           const updatedProperty = {
             ...selectedProperty,
             ...response.property,
-            // Ensure images array is set
-            images: response.images || response.property.images || selectedProperty.images || [],
+            images: displayImages,
+            uploadedImages: userImages && userImages.length > 0 ? userImages : undefined,
           };
 
-          // Mark this property as fetched
           fetchedPropertyRef.current = propertyIdentifier;
 
-          // Update selectedProperty in Redux
           dispatch(setSelectedProperty(updatedProperty));
-          
-          // Update property in stored search results so it has full details when user goes back
           updatePropertyInSearchResults(updatedProperty);
-          
+
           toast.success(
-            response.message || 
-            `Fetched property details with ${response.imageCount || response.images?.length || 0} images`
+            userImages?.length
+              ? `Property details loaded. Showing your ${userImages.length} uploaded photo(s).`
+              : response.message || `Fetched property details with ${response.imageCount || response.images?.length || 0} images`
           );
         }
       } catch (error) {
@@ -502,9 +510,10 @@ const PropertyDetailsView = () => {
         ...((selectedProperty.propertyType || selectedProperty.property_type || selectedProperty.type) && {
           propertyType: selectedProperty.propertyType || selectedProperty.property_type || selectedProperty.type
         }),
-        // Images - handle multiple field name variations
-        ...((selectedProperty.images || selectedProperty.imageUrls || selectedProperty.photos || selectedProperty.photoUrls) && {
-          images: Array.isArray(selectedProperty.images) ? selectedProperty.images :
+        // Images - prefer user-uploaded subject photos (SOP: compare comps to subject using subject photos)
+        ...((selectedProperty.uploadedImages || selectedProperty.images || selectedProperty.imageUrls || selectedProperty.photos || selectedProperty.photoUrls) && {
+          images: Array.isArray(selectedProperty.uploadedImages) && selectedProperty.uploadedImages.length > 0 ? selectedProperty.uploadedImages :
+                 Array.isArray(selectedProperty.images) ? selectedProperty.images :
                  Array.isArray(selectedProperty.imageUrls) ? selectedProperty.imageUrls :
                  Array.isArray(selectedProperty.photos) ? selectedProperty.photos :
                  Array.isArray(selectedProperty.photoUrls) ? selectedProperty.photoUrls :
@@ -702,14 +711,15 @@ const PropertyDetailsView = () => {
         holdingCost: maoInputs.holdingCost || 0,
         closingCost: maoInputs.closingCost || 0,
         wholesaleFee: maoInputs.wholesaleFee || 0,
-        maoRule: maoInputs.maoRule || "70%",
+        maoRule: maoInputs.maoRule || "sop",
       };
 
       const response = await analyzeSelectedComps({
         propertyId: propertyIdForApi,
         selectedCompIds,
-          maoInputs: maoInputsPayload,
-        }).unwrap();
+        maoInputs: maoInputsPayload,
+        subjectImages: selectedProperty?.uploadedImages?.length ? selectedProperty.uploadedImages : (selectedProperty?.images || []),
+      }).unwrap();
 
       if (response.success && response.data) {
         dispatch(
@@ -754,6 +764,10 @@ const PropertyDetailsView = () => {
 
   const handleMaoInputChange = (updates) => {
     dispatch(setMAOInputs(updates));
+  };
+
+  const handleRepairInputChange = (updates) => {
+    dispatch(setRepairInputs(updates));
   };
 
   if (!selectedProperty) {
@@ -817,6 +831,9 @@ const PropertyDetailsView = () => {
           isAnalyzing={isAnalyzing}
           maoInputs={maoInputs}
           onMaoInputChange={handleMaoInputChange}
+          selectedProperty={selectedProperty}
+          repairInputs={repairInputs}
+          onRepairInputChange={handleRepairInputChange}
         />
       </div>
     );

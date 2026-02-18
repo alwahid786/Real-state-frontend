@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Input from "../shared/Input";
 import Button from "../shared/Button";
 import Modal from "../shared/Modal";
@@ -10,8 +10,20 @@ const MAOInputEditor = ({ currentInputs, onRecalculate, isLoading }) => {
     holdingCost: currentInputs?.holdingCost || 0,
     closingCost: currentInputs?.closingCost || 0,
     wholesaleFee: currentInputs?.wholesaleFee || 0,
-    maoRule: currentInputs?.maoRule || "70%",
+    maoRule: currentInputs?.maoRule || "sop",
   });
+
+  useEffect(() => {
+    if (isOpen && currentInputs) {
+      setInputs({
+        estimatedRepairs: currentInputs.estimatedRepairs ?? 0,
+        holdingCost: currentInputs.holdingCost ?? 0,
+        closingCost: currentInputs.closingCost ?? 0,
+        wholesaleFee: currentInputs.wholesaleFee ?? 0,
+        maoRule: currentInputs.maoRule || "sop",
+      });
+    }
+  }, [isOpen, currentInputs]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -95,8 +107,9 @@ const MAOInputEditor = ({ currentInputs, onRecalculate, isLoading }) => {
                 onChange={handleChange}
                 className="w-full h-12 px-4 border border-[#E4E4E7] rounded-md outline-none text-sm"
               >
+                <option value="sop">SOP (7.5% ROI + $20K spread)</option>
                 <option value="65%">65% Rule</option>
-                <option value="70%">70% Rule (Standard)</option>
+                <option value="70%">70% Rule</option>
                 <option value="75%">75% Rule</option>
                 <option value="custom">Custom</option>
               </select>

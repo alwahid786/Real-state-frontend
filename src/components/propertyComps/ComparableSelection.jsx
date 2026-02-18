@@ -1,10 +1,53 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Button from "../shared/Button";
 import ImageSlider from "./ImageSlider";
 import { formatCurrency, formatDate, getPropertyImages } from "../../utils/formatters";
 
-const ComparableSelection = ({ comparables, selectedCompIds, onToggleComp, onAnalyze, isAnalyzing, maoInputs, onMaoInputChange }) => {
+/** Compute total repair from user inputs (rate/sqft, roof, AC, other, 10% buffer) */
+function computeTotalRepair(repairInputs, subjectSqft) {
+  const sqft = Number(subjectSqft) || 0;
+  const rate = Number(repairInputs.rehabPerSqft) || 0;
+  const base = rate * sqft;
+  const roof = repairInputs.needsRoof ? (Number(repairInputs.roofCost) || 0) : 0;
+  const ac = repairInputs.needsAC ? (Number(repairInputs.acCost) || 0) : 0;
+  const other = Number(repairInputs.otherRepair) || 0;
+  let total = base + roof + ac + other;
+  if (repairInputs.addBuffer) total = total * 1.1;
+  return Math.round(total);
+}
+
+const ComparableSelection = ({
+  comparables,
+  selectedCompIds,
+  onToggleComp,
+  onAnalyze,
+  isAnalyzing,
+  maoInputs,
+  onMaoInputChange,
+  selectedProperty,
+  repairInputs = {},
+  onRepairInputChange,
+}) => {
   const [showMaoInputs, setShowMaoInputs] = useState(false);
+  const [showRepairInputs, setShowRepairInputs] = useState(true);
+
+  const subjectSqft =
+    selectedProperty?.squareFootage ??
+    selectedProperty?.square_footage ??
+    selectedProperty?.sqft ??
+    0;
+
+  const totalRepair = useMemo(
+    () => computeTotalRepair(repairInputs, subjectSqft),
+    [repairInputs, subjectSqft]
+  );
+
+  useEffect(() => {
+    if (onMaoInputChange && totalRepair >= 0) {
+      onMaoInputChange({ estimatedRepairs: totalRepair });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalRepair]);
 
   const selectedCount = selectedCompIds.length;
   const canAnalyze = selectedCount >= 1 && selectedCount <= 5;
@@ -95,6 +138,159 @@ const ComparableSelection = ({ comparables, selectedCompIds, onToggleComp, onAna
         )}
       </div>
 
+      {/* Repair Estimate Section */}
+      <div className="border border-[#E4E4E7] rounded-lg p-6 bg-white">
+        <button
+          onClick={() => setShowRepairInputs(!showRepairInputs)}
+          className="w-full flex items-center justify-between text-left"
+        >
+          <h3 className="text-lg font-semibold text-primary">
+            Repair Estimate
+          </h3>
+          <span className="text-primary">{showRepairInputs ? "−" : "+"}</span>
+        </button>
+
+        {showRepairInputs && (
+          <div className="mt-4 space-y-4">
+            <p className="text-sm text-gray-600">
+              Enter repair assumptions. Total repairs are used with comps to calculate ARV and MAO.
+            </p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Subject property sqft (from listing)
+                </label>
+                <input
+                  type="text"
+                  value={subjectSqft ? subjectSqft.toLocaleString() : "—"}
+                  readOnly
+                  className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Rate per sqft ($) — rehab
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step={1}
+                  value={repairInputs.rehabPerSqft ?? 25}
+                  onChange={(e) =>
+                    onRepairInputChange?.({ rehabPerSqft: parseFloat(e.target.value) || 0 })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  e.g. Light $15, Medium $20–25, Heavy $30–35
+                </p>
+              </div>
+            </div>
+            <div className="border-t border-gray-200 pt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!repairInputs.needsRoof}
+                    onChange={(e) =>
+                      onRepairInputChange?.({ needsRoof: e.target.checked })
+                    }
+                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Needs roof replacement
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step={100}
+                  value={repairInputs.roofCost ?? 19000}
+                  onChange={(e) =>
+                    onRepairInputChange?.({ roofCost: parseFloat(e.target.value) || 0 })
+                  }
+                  disabled={!repairInputs.needsRoof}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:bg-gray-100"
+                  placeholder="Roof cost ($)"
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={!!repairInputs.needsAC}
+                    onChange={(e) =>
+                      onRepairInputChange?.({ needsAC: e.target.checked })
+                    }
+                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                  />
+                  <span className="text-sm font-medium text-gray-700">
+                    Needs AC / HVAC replacement
+                  </span>
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step={100}
+                  value={repairInputs.acCost ?? 7500}
+                  onChange={(e) =>
+                    onRepairInputChange?.({ acCost: parseFloat(e.target.value) || 0 })
+                  }
+                  disabled={!repairInputs.needsAC}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-50 disabled:bg-gray-100"
+                  placeholder="AC/HVAC cost ($)"
+                />
+                <p className="text-xs text-gray-500">e.g. 1 unit $7,500, 2 units $15,000</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Other repairs ($)
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step={100}
+                  value={repairInputs.otherRepair ?? 0}
+                  onChange={(e) =>
+                    onRepairInputChange?.({ otherRepair: parseFloat(e.target.value) || 0 })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                  placeholder="0"
+                />
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer self-end">
+                <input
+                  type="checkbox"
+                  checked={!!repairInputs.addBuffer}
+                  onChange={(e) =>
+                    onRepairInputChange?.({ addBuffer: e.target.checked })
+                  }
+                  className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                />
+                <span className="text-sm font-medium text-gray-700">
+                  Add 10% miscellaneous buffer
+                </span>
+              </label>
+            </div>
+            <div className="pt-3 border-t border-gray-200">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-700">
+                  Total estimated repairs
+                </span>
+                <span className="text-xl font-bold text-primary">
+                  {formatCurrency(totalRepair)}
+                </span>
+              </div>
+              <p className="text-xs text-gray-500 mt-1">
+                This total is sent as &quot;Estimated Repairs&quot; for ARV/MAO calculation.
+              </p>
+            </div>
+          </div>
+        )}
+      </div>
+
       {/* MAO Inputs Section */}
       <div className="border border-[#E4E4E7] rounded-lg p-6 bg-white">
         <button
@@ -102,7 +298,7 @@ const ComparableSelection = ({ comparables, selectedCompIds, onToggleComp, onAna
           className="w-full flex items-center justify-between text-left"
         >
           <h3 className="text-lg font-semibold text-primary">
-            MAO Calculation Inputs
+            MAO &amp; Fees
           </h3>
           <span className="text-primary">{showMaoInputs ? "−" : "+"}</span>
         </button>
@@ -111,13 +307,13 @@ const ComparableSelection = ({ comparables, selectedCompIds, onToggleComp, onAna
           <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Estimated Repairs ($)
+                Estimated Repairs ($) — from Repair Estimate above
               </label>
               <input
                 type="number"
                 value={maoInputs.estimatedRepairs || 0}
-                onChange={(e) => onMaoInputChange({ estimatedRepairs: parseFloat(e.target.value) || 0 })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+                readOnly
+                className="w-full px-3 py-2 border border-gray-200 rounded-md bg-gray-50 text-gray-700"
               />
             </div>
             <div>
@@ -158,10 +354,11 @@ const ComparableSelection = ({ comparables, selectedCompIds, onToggleComp, onAna
                 MAO Rule
               </label>
               <select
-                value={maoInputs.maoRule || "70%"}
+                value={maoInputs.maoRule || "sop"}
                 onChange={(e) => onMaoInputChange({ maoRule: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               >
+                <option value="sop">SOP (7.5% ROI + $20K spread)</option>
                 <option value="65%">65%</option>
                 <option value="70%">70%</option>
                 <option value="75%">75%</option>

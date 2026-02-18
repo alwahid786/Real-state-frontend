@@ -20,7 +20,9 @@ const MAOBreakdownCard = ({ mao }) => {
 
         <div className="flex justify-between items-center py-2">
           <span className="text-gray-600">
-            Base MAO ({Math.round(breakdown.rulePercent * 100)}% Rule)
+            {breakdown.useSOP || breakdown.rulePercent == null || !Number.isFinite(breakdown.rulePercent)
+              ? "Base MAO (SOP: 7.5% ROI + $20K spread)"
+              : `Base MAO (${Math.round(breakdown.rulePercent * 100)}% Rule)`}
           </span>
           <span className="font-semibold text-primary">
             {formatCurrency(breakdown.baseMAO)}

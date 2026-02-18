@@ -5,24 +5,27 @@ import PropertySearchForm from "../../../components/propertyComps/PropertySearch
 import PropertySearchResults from "../../../components/propertyComps/PropertySearchResults";
 import {
   useSearchPropertyByAddressMutation,
+  useUploadPropertyImagesMutation,
 } from "../rtk/propertyCompsApis";
 import {
   setSearchResults,
   setSearchFilters,
   setSelectedProperty,
+  setSubjectUploadedImages,
 } from "../rtk/propertyCompsSlice";
 import { toast } from "react-toastify";
-import {
-  saveSelectedProperty,
-} from "../../../utils/localStorage";
+import { saveSelectedProperty } from "../../../utils/localStorage";
 
 const PropertySearchView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { searchResults: reduxSearchResults, searchFilters: reduxSearchFilters } = useSelector(
-    (state) => state.propertyComps
-  );
-  const [searchPropertyByAddress, { isLoading }] = useSearchPropertyByAddressMutation();
+  const {
+    searchResults: reduxSearchResults,
+    subjectUploadedImages,
+  } = useSelector((state) => state.propertyComps);
+  const [searchPropertyByAddress, { isLoading: isSearching }] = useSearchPropertyByAddressMutation();
+  const [uploadPropertyImages, { isLoading: isUploading }] = useUploadPropertyImagesMutation();
+  const isLoading = isSearching || isUploading;
   const [searchResults, setLocalResults] = useState([]);
   const [originalFilters, setOriginalFilters] = useState(null);
 
@@ -47,7 +50,6 @@ const PropertySearchView = () => {
         })
       );
 
-      // Validate address
       if (!filters.address || filters.address.trim().length === 0) {
         toast.error("Please enter a property address");
         dispatch(
@@ -62,7 +64,32 @@ const PropertySearchView = () => {
         return;
       }
 
-      // Search property by address
+      // Upload subject property images first if user added any (these replace listing photos on details)
+      const imageFiles = filters.imageFiles || [];
+      if (imageFiles.length > 0) {
+        const formData = new FormData();
+        imageFiles.forEach((file) => formData.append("images", file));
+        try {
+          const uploadRes = await uploadPropertyImages(formData).unwrap();
+          if (uploadRes.success && uploadRes.urls?.length) {
+            dispatch(setSubjectUploadedImages(uploadRes.urls));
+            toast.success(`${uploadRes.urls.length} photo(s) uploaded`);
+          }
+        } catch (uploadErr) {
+          console.error("Upload error:", uploadErr);
+          const msg =
+            uploadErr?.data?.error ||
+            uploadErr?.data?.message ||
+            uploadErr?.message ||
+            "Photo upload failed. Continuing with search.";
+          toast.error(msg);
+          dispatch(setSubjectUploadedImages([]));
+        }
+      } else {
+        dispatch(setSubjectUploadedImages([]));
+      }
+
+      // Search property by address (address scraping actor)
       const response = await searchPropertyByAddress({ address: filters.address.trim() }).unwrap();
 
       if (response.success && response.property) {
@@ -129,10 +156,12 @@ const PropertySearchView = () => {
   };
 
   const handleSelectProperty = (property) => {
-    // Save to localStorage
-    saveSelectedProperty(property);
-    // Save to Redux
-    dispatch(setSelectedProperty(property));
+    // Attach user-uploaded images so details view shows them instead of listing photos
+    const propertyWithUploadedImages = subjectUploadedImages?.length
+      ? { ...property, uploadedImages: subjectUploadedImages, images: subjectUploadedImages }
+      : property;
+    saveSelectedProperty(propertyWithUploadedImages);
+    dispatch(setSelectedProperty(propertyWithUploadedImages));
     navigate("/property-details");
   };
 
