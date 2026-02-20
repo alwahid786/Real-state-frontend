@@ -734,7 +734,7 @@ const PropertyDetailsView = () => {
       isComplete: false,
     });
 
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000/api";
+    const baseUrl = import.meta.env.VITE_BASE_URL || "http://localhost:4000/api";
     const authToken = token || localStorage.getItem("token") || localStorage.getItem("accessToken");
 
     const maoInputsPayload = {
