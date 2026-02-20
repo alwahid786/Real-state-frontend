@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import PropertyDetailsCard from "../../../components/propertyComps/PropertyDetailsCard";
 import AnalysisLoader from "../../../components/propertyComps/AnalysisLoader";
+import AnalysisProgressView from "../../../components/propertyComps/AnalysisProgressView";
 import ComparableSelection from "../../../components/propertyComps/ComparableSelection";
 import {
   useFindComparablesMutation,
@@ -13,12 +14,16 @@ import {
 import { setAnalysis, setImageAnalyses, setMAOInputs, setRepairInputs, setComparables, setSelectedCompIds, setSelectedProperty } from "../rtk/propertyCompsSlice";
 import { toast } from "react-toastify";
 import { saveSelectedProperty, loadSelectedProperty, updatePropertyInSearchResults } from "../../../utils/localStorage";
+import { analyzeSelectedCompsStream } from "../../../utils/analysisStream";
 
 const PropertyDetailsView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { selectedProperty, maoInputs, repairInputs, comparables, selectedCompIds, searchFilters } = useSelector(
     (state) => state.propertyComps
+  );
+  const token = useSelector(
+    (s) => s?.auth?.user?.token || s?.auth?.user?.accessToken
   );
   const [findComparables, { isLoading: isFindingComps }] =
     useFindComparablesMutation();
@@ -29,6 +34,18 @@ const PropertyDetailsView = () => {
   
   const [analysisStep, setAnalysisStep] = useState(null); // 'finding', 'analyzing', null
   const [showComparables, setShowComparables] = useState(false);
+  const [analysisProgress, setAnalysisProgress] = useState({
+    subjectAddress: null,
+    steps: [],
+    currentStep: null,
+    compBeingAnalyzed: null,
+    compIndex: null,
+    compTotal: null,
+    arv: null,
+    mao: null,
+    estimatedRepairs: null,
+    isComplete: false,
+  });
   
   // Ref to track if we've already fetched details for this property
   const fetchedPropertyRef = useRef(null);
@@ -681,7 +698,7 @@ const PropertyDetailsView = () => {
     }
   };
 
-  // Step 3: Run analysis with selected comps
+  // Step 3: Run analysis with selected comps (streaming progress)
   const handleAnalyzeSelected = async () => {
     const propId = getPropertyId(selectedProperty);
     
@@ -690,7 +707,6 @@ const PropertyDetailsView = () => {
       return;
     }
 
-    // Prefer _id over zpid for backend API calls
     const propertyIdForApi = selectedProperty._id || propId;
 
     if (!selectedCompIds || selectedCompIds.length < 1 || selectedCompIds.length > 5) {
@@ -698,47 +714,79 @@ const PropertyDetailsView = () => {
       return;
     }
     
-    // Warn if less than 3 comps selected (but allow it)
     if (selectedCompIds.length < 3) {
       toast.warning(`Only ${selectedCompIds.length} comparable${selectedCompIds.length === 1 ? '' : 's'} selected. Analysis requires at least 3 comparables for accurate results.`);
     }
 
+    const subjectAddress = selectedProperty?.formattedAddress || selectedProperty?.address || selectedProperty?.rawAddress || "";
+
+    setAnalysisStep("analyzing");
+    setAnalysisProgress({
+      subjectAddress,
+      steps: [],
+      currentStep: "subject_prep",
+      compBeingAnalyzed: null,
+      compIndex: null,
+      compTotal: selectedCompIds.length,
+      arv: null,
+      mao: null,
+      estimatedRepairs: null,
+      isComplete: false,
+    });
+
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000/api";
+    const authToken = token || localStorage.getItem("token") || localStorage.getItem("accessToken");
+
+    const maoInputsPayload = {
+      estimatedRepairs: maoInputs.estimatedRepairs || 0,
+      holdingCost: maoInputs.holdingCost || 0,
+      closingCost: maoInputs.closingCost || 0,
+      wholesaleFee: maoInputs.wholesaleFee || 0,
+      maoRule: maoInputs.maoRule || "sop",
+    };
+
+    const body = {
+      propertyId: propertyIdForApi,
+      selectedCompIds,
+      maoInputs: maoInputsPayload,
+      subjectImages: selectedProperty?.uploadedImages?.length ? selectedProperty.uploadedImages : (selectedProperty?.images || []),
+    };
+
     try {
-      setAnalysisStep("analyzing");
-      
-      const maoInputsPayload = {
-        estimatedRepairs: maoInputs.estimatedRepairs || 0,
-        holdingCost: maoInputs.holdingCost || 0,
-        closingCost: maoInputs.closingCost || 0,
-        wholesaleFee: maoInputs.wholesaleFee || 0,
-        maoRule: maoInputs.maoRule || "sop",
-      };
+      const result = await analyzeSelectedCompsStream(baseUrl, authToken, body, (ev) => {
+        if (ev.type === "step") {
+          setAnalysisProgress((prev) => ({
+            ...prev,
+            steps: [...prev.steps, ev],
+            currentStep: ev.step,
+            compBeingAnalyzed: ev.address || (ev.step === "comp" ? ev.address : null),
+            compIndex: ev.index ?? prev.compIndex,
+            compTotal: ev.total ?? prev.compTotal,
+            arv: ev.arv ?? prev.arv,
+            mao: ev.mao ?? prev.mao,
+            estimatedRepairs: ev.estimatedRepairs ?? prev.estimatedRepairs,
+          }));
+        }
+      });
 
-      const response = await analyzeSelectedComps({
-        propertyId: propertyIdForApi,
-        selectedCompIds,
-        maoInputs: maoInputsPayload,
-        subjectImages: selectedProperty?.uploadedImages?.length ? selectedProperty.uploadedImages : (selectedProperty?.images || []),
-      }).unwrap();
-
-      if (response.success && response.data) {
-        dispatch(
-          setAnalysis({
-            loading: false,
-            error: null,
-            data: response.data,
-          })
-        );
-        setAnalysisStep(null);
+      if (result && result.type === "complete" && result.data) {
+        setAnalysisProgress((prev) => ({ ...prev, isComplete: true, currentStep: "complete" }));
+        dispatch(setAnalysis({ loading: false, error: null, data: result.data }));
         toast.success("Property analysis completed successfully!");
-        navigate("/analysis-results");
+      } else if (result && result.type === "complete") {
+        const data = result.data || result;
+        setAnalysisProgress((prev) => ({ ...prev, isComplete: true, currentStep: "complete" }));
+        dispatch(setAnalysis({ loading: false, error: null, data: data?.data || data }));
+        toast.success("Property analysis completed successfully!");
       } else {
         setAnalysisStep(null);
-        toast.error(response.message || "Analysis failed");
+        setAnalysisProgress((prev) => ({ ...prev, isComplete: false }));
+        toast.error("Analysis did not return results.");
       }
     } catch (error) {
       console.error("Analysis error:", error);
       setAnalysisStep(null);
+      setAnalysisProgress((prev) => ({ ...prev, isComplete: false }));
       
       if (error.status === 401) {
         toast.error("Unauthorized. Please sign in again.");
@@ -760,6 +808,23 @@ const PropertyDetailsView = () => {
         })
       );
     }
+  };
+
+  const handleViewAnalysisResults = () => {
+    setAnalysisStep(null);
+    setAnalysisProgress({
+      subjectAddress: null,
+      steps: [],
+      currentStep: null,
+      compBeingAnalyzed: null,
+      compIndex: null,
+      compTotal: null,
+      arv: null,
+      mao: null,
+      estimatedRepairs: null,
+      isComplete: false,
+    });
+    navigate("/analysis-results");
   };
 
   const handleMaoInputChange = (updates) => {
@@ -797,15 +862,55 @@ const PropertyDetailsView = () => {
     );
   }
 
-  // Show loading state while finding comparables or analyzing
-  if (isFindingComps || isAnalyzing) {
-    const message = analysisStep === "finding" 
-      ? "Searching for sold comparables... This may take 30-60 seconds."
-      : analysisStep === "analyzing"
-      ? "Running analysis with selected comparables... This may take 1-2 minutes."
-      : "Processing...";
-    
-    return <AnalysisLoader message={message} />;
+  // Show loading state while finding comparables
+  if (isFindingComps) {
+    return (
+      <AnalysisLoader message="Searching for sold comparables... This may take 30-60 seconds." />
+    );
+  }
+
+  // Show step-by-step progress while analyzing (streaming)
+  if (analysisStep === "analyzing") {
+    return (
+      <div className="space-y-6">
+        <div>
+          <button
+            type="button"
+            onClick={() => {
+              setAnalysisStep(null);
+              setAnalysisProgress({
+                subjectAddress: null,
+                steps: [],
+                currentStep: null,
+                compBeingAnalyzed: null,
+                compIndex: null,
+                compTotal: null,
+                arv: null,
+                mao: null,
+                estimatedRepairs: null,
+                isComplete: false,
+              });
+            }}
+            className="text-primary underline mb-4"
+          >
+            ← Cancel
+          </button>
+        </div>
+        <AnalysisProgressView
+          subjectAddress={analysisProgress.subjectAddress}
+          steps={analysisProgress.steps}
+          currentStep={analysisProgress.currentStep}
+          compBeingAnalyzed={analysisProgress.compBeingAnalyzed}
+          compIndex={analysisProgress.compIndex}
+          compTotal={analysisProgress.compTotal}
+          arv={analysisProgress.arv}
+          mao={analysisProgress.mao}
+          estimatedRepairs={analysisProgress.estimatedRepairs}
+          isComplete={analysisProgress.isComplete}
+          onViewResults={handleViewAnalysisResults}
+        />
+      </div>
+    );
   }
 
   // Show comparables selection if found

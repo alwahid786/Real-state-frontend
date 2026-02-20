@@ -36,7 +36,7 @@ const ComparablesTable = ({ comps }) => {
                 Sale Price
               </th>
               <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
-                Adjusted Price
+                Adjusted ARV
               </th>
               <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
                 Distance

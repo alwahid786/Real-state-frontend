@@ -441,6 +441,19 @@ const ComparableSelection = ({
                   </div>
                 )}
 
+                {/* Adjusted ARV (SOP Step 5: bed/bath, garage, sqft, lot, pool, condition adjustments) */}
+                {comp.adjustedPrice != null && comp.adjustedPrice > 0 && (
+                  <div>
+                    <p className="text-xs text-gray-600">Adjusted ARV</p>
+                    <p className="text-lg font-bold text-primary">
+                      {formatCurrency(comp.adjustedPrice)}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Adjusted to subject (sqft, bed/bath, lot, garage, condition)
+                    </p>
+                  </div>
+                )}
+
                 {/* Sale Date */}
                 {comp.saleDate && (
                   <div>
