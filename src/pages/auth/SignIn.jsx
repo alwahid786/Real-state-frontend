@@ -17,6 +17,12 @@ const SignIn = () => {
       }
       const res = await loginUser({ email, password }).unwrap();
       if (res.success) {
+        // Store token so APIs work cross-origin in production (Bearer header)
+        const token = res.data?.accessToken || res.data?.token;
+        if (token) {
+          localStorage.setItem("accessToken", token);
+          localStorage.setItem("token", token);
+        }
         toast.success(res.message || "Login successful!");
         dispatch(userExist(res.data));
         navigate("/users");

@@ -6,6 +6,18 @@ const authApis = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: `${BaseUrl}/auth`,
     credentials: "include",
+    prepareHeaders: (headers, { getState }) => {
+      const state = getState();
+      const token =
+        state?.auth?.user?.accessToken ||
+        state?.auth?.user?.token ||
+        localStorage.getItem("accessToken") ||
+        localStorage.getItem("token");
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   endpoints: (builder) => ({
     login: builder.mutation({

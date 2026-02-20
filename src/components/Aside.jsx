@@ -59,6 +59,8 @@ const Aside = () => {
     try {
       const res = await logout().unwrap();
       if (res.success) {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("token");
         dispatch(userNotExist());
         navigate("/sign-in");
         toast.success(res.message || "Logout successful!");

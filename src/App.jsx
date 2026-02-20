@@ -30,7 +30,8 @@ const App = () => {
         if (!user) {
           const res = await getMyProfile().unwrap();
           if (res.success) {
-            dispatch(userExist(res.data));
+            const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+            dispatch(userExist({ ...res.data, ...(token && { accessToken: token, token }) }));
           } else {
             dispatch(userNotExist());
           }
