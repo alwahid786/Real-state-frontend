@@ -25,11 +25,19 @@ const App = () => {
   const [getMyProfile] = useGetMyProfileMutation();
 
   useEffect(() => {
+    const PROFILE_FETCH_TIMEOUT_MS = 12000; // 12s so backend can cold-start (e.g. Render)
+
     const fetchUserProfile = async () => {
       try {
         if (!user) {
-          const res = await getMyProfile().unwrap();
-          if (res.success) {
+          const timeoutPromise = new Promise((_, reject) =>
+            setTimeout(() => reject(new Error("Profile request timeout")), PROFILE_FETCH_TIMEOUT_MS)
+          );
+          const res = await Promise.race([
+            getMyProfile().unwrap(),
+            timeoutPromise,
+          ]);
+          if (res?.success) {
             const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
             dispatch(userExist({ ...res.data, ...(token && { accessToken: token, token }) }));
           } else {
@@ -38,7 +46,11 @@ const App = () => {
         }
       } catch (error) {
         dispatch(userNotExist());
-        console.error("Failed to fetch user profile:", error);
+        if (error?.message === "Profile request timeout") {
+          console.warn("Profile request timed out – backend may be unreachable or slow. Showing sign-in.");
+        } else {
+          console.error("Failed to fetch user profile:", error);
+        }
       } finally {
         setLoading(false);
       }
